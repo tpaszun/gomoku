@@ -25,6 +25,7 @@ Struktury do reprezentacji stanu gry:
 
 # [DONE] Wyświetlanie stanu gry, wczytywanie stanu gry
 
+```
  | | | | | | | | | | | | | | | | | |
  | | | | |X| | | | | | | | | | | | |
  | | | |X| | | | | | | | | | | | | |
@@ -44,7 +45,7 @@ Struktury do reprezentacji stanu gry:
  | | | | | | | | | | | | | | | | | |
  | | | | | | | | | | | | | | | | | |
  | | | | | | | | | | | | | | | | | |
-
+```
 
 # [DONE] Wykrywanie wygranej
 # [DONE] Generowanie listy następnych ruchów
@@ -104,21 +105,18 @@ Struktury do reprezentacji stanu gry:
   - https://www.microsoft.com/en-us/research/wp-content/uploads/2016/07/haskell-beats-C.pdf
 4. Profilowanie
   - https://www.fpcomplete.com/blog/2015/04/ghc-prof-flamegraph
-
-    compile: ghc --make -auto-all -prof -rtsopts <sources>
-    run:     <binary> +RTS -p -RTS
-             cat <binary>.prof | ghc-prof-flamegraph > <binary>.folded
-             <binary>.folded | flamegraph.pl > <binary>.svg
+    ```
+        compile: ghc --make -auto-all -prof -rtsopts <sources>
+        run:     <binary> +RTS -p -RTS
+                 cat <binary>.prof | ghc-prof-flamegraph > <binary>.folded
+                 <binary>.folded | flamegraph.pl > <binary>.svg
+    ```
 5. Alpha-Beta pruning:
   - http://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-4-alpha-beta-pruning/
   - http://web.cs.ucla.edu/~rosen/161/notes/alphabeta.html
   - http://inst.eecs.berkeley.edu/~cs61b/fa14/ta-materials/apps/ab_tree_practice/
   - https://hackage.haskell.org/package/game-tree-0.1.0.0
 
-
-Applicative
-
-(+) <$> (Just 5) <*> (Just 6)
 
 # Data.Tree.Pretty drawVerticalTree
 

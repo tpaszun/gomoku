@@ -1,5 +1,6 @@
 # Board as Vector of Word32
 
+```
   Store Board as a U.Vector Word32, where
     each line is Word32
     each field is 2 bits of Word32, where first field in list is least significant 2 bits
@@ -13,7 +14,7 @@
     X - 01
     O - 10
     _ - 00
-
+```
     Word32 - 32bit => max 16 fields
     For boards 16x16 < x <= 32x32 (19x19 particularly) Word32 should be changed to Word64
 
@@ -80,8 +81,8 @@ index  line                         line length
 
 ## Line lengths
 
-  - horizontal & vertical: line < (boardLength * 2) = boardLength
-  - diagonal: line >= (boardLength * 2) = (line - (boardLength * 2)) mod (boardLength * 2 - 1)
+  - horizontal & vertical: `line < (boardLength * 2) = boardLength`
+  - diagonal: `line >= (boardLength * 2) = (line - (boardLength * 2)) mod (boardLength * 2 - 1)`
 
 
 # Update board with move x, y
@@ -112,6 +113,7 @@ index  line                         line length
 
 ## Patterns (fives)
 
+```
 [
     -- prefix
     00 10 10 10 10 10
@@ -128,9 +130,11 @@ index  line                         line length
     10 10 10 10 10
     10 10 10 10 10
 ]
+```
 
 ## Patterns cache
 
+```
 [
   -- Black
     -- prefixes
@@ -175,11 +179,13 @@ index  line                         line length
       -- threes
       -- doubles
 ]
+```
 
 ## Match pattern with line
 
 ### Prefix
 
+```
 line:
                      01 10 01 10 10 00 10 00
 pattern (prefix):
@@ -192,10 +198,11 @@ patten XOR (line AND mask):
                            00 00 00 10 00 10
 
 (patten XOR (line AND mask) == 0) -> pattern matched with line
-
+```
 
 ### Suffix
 
+```
 line:
                      01 10 01 10 10 00 10 00
 pattern (suffix):
@@ -208,10 +215,11 @@ patten XOR (line AND mask):
                      11 00 11 00 00 01(00 00)
 
 (patten XOR (line AND mask) == 0) -> pattern matched with line
-
+```
 
 ### Infix
 
+```
 subsegment n = (shiftR line n) AND mask
 
 line subsegment:
@@ -222,7 +230,7 @@ patten XOR line:
                      01 00 11 00 00 10 10
 
 (patten XOR line subsegment == 0) -> pattern matched with line subsegment
-
+```
 
 
 
@@ -232,6 +240,7 @@ there are only four lines of length 5:
   - two in left diagonals
   - two in right diagonals
 
+```
 line:
                      01 10 01 10 10
 pattern (exact):
@@ -240,3 +249,4 @@ patten XOR line:
                      11 00 11 00 00
 
 (patten XOR line == 0) -> pattern matched with line
+```
