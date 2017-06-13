@@ -6,8 +6,6 @@ import Gomoku.Abstractions
 
 import Text.ParserCombinators.Parsec
 import Text.ParserCombinators.Parsec.Number
-import Text.ParserCombinators.Parsec.Char
-import Text.ParserCombinators.Parsec.Error
 
 import Data.Char
 
@@ -30,7 +28,6 @@ parsePosC = do
               unexpected "Tylko znaki od a - z"
             else
               return $ (ord x) - (ord 'a') + 1
-
 
 parseSinglePos = choice [parsePosI, parsePosC]
 

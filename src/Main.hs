@@ -12,7 +12,7 @@ import Data.Time.Clock
 import Data.Char
 
 
-
+import Gomoku.BitBoard.Helpers
 import Debug.Trace
 
 main = humanMove newGame Black

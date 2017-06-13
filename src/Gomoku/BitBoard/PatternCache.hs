@@ -48,6 +48,7 @@ patternsRange _ _ _ = error $ "invalid patternsRange request"
 
 
 -- store all generated patterns as a unboxed vector of patterns
+patternsCache :: U.Vector Word32
 patternsCache =
   U.fromList $ L.map (fromLine) $
   L.concat [ genPatterns player patternType len | player <- [Black, White],

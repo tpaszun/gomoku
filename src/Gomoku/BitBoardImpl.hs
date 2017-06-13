@@ -9,7 +9,7 @@ import Gomoku.BitBoard.PatternMatching
 import qualified Data.Vector.Unboxed as U
 import qualified Data.List as L
 import Data.Word
-
+import Data.Bits
 
 
 {-
@@ -88,6 +88,42 @@ instance Board BitBoard where
         white = evaluatePlayer board White
     }
 
+-- evaluateMove :: BitBoard -> Move -> BoardEvaluation
+-- evaluateMove board move =
+
+--   where
+--     evalPlayer p = layerEvaluation {
+--         fives = xss 5,
+--         fours = xss 4,
+--         threes = xss 3,
+--         doubles = xss 2
+--     }
+--       where
+--         xss n = openXsInIntersection intersection size p x openXsInBoard board player n
+
+--     intersection = U.fromList [
+--       (size,                            (horizontal board) U.! x),
+--       (size,                            (vertical board) U.! y),
+--       (getLineLength board diagLindex,  diagL),
+--       (getLineLength board diagRindex,  diagR) ]
+--     diagLindex = 0
+--     diagRindex = 0
+--     (BitBoard internalRep size) = board
+--     (Move x y player) = move
+--     diagL = fromLine $
+--             L.map (getField board) $
+--             [(startX + d, startY + d) | let startX = if x < y then 0                 else x - y,
+--                                         let startY = if x < y then y - x             else 0,
+--                                         let len    = if x < y then size - startY - 1 else size - startX - 1,
+--                                         d <- [0..len] ]
+
+--     diagR = fromLine $
+--             L.map (getField board) $
+--             [(startX + d, startY - d) | let startX = if x + y < (size - 1) then 0          else x + y - size + 1,
+--                                         let startY = if x + y < (size - 1) then x + y      else size - 1,
+--                                         let len    = if x + y < (size - 1) then startY     else size - startX - 1,
+--                                         d <- [0..len] ]
+
 
 instance Show BitBoard where
   show bitboard = L.concat drawBoard
@@ -112,6 +148,5 @@ instance CBitBoard BitBoard where
   diagonalR (BitBoard internal boardLength) = U.slice (boardLength*4 - 1) (boardLength*2 - 1) internal
 
   getField (BitBoard board _) (x,y) = lineElem (board U.! y) x
-
 
 

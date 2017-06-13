@@ -24,3 +24,32 @@ executable gomoku
                        time,
                        parsec,
                        parsec-numbers
+
+library
+  ghc-options:         -Wall
+  exposed-modules:     Gomoku.Abstractions,
+                       Gomoku.BitBoard,
+                       Gomoku.BitBoardImpl,
+                       Gomoku.BitBoard.Helpers,
+                       Gomoku.Patterns,
+                       Gomoku.BitBoard.PatternMatching,
+                       Gomoku.BitBoard.PatternCache,
+                       Gomoku.BitBoard.Wizardry
+  build-depends:       base >= 4.7 && <5,
+                       vector,
+                       containers,
+                       time,
+                       parsec,
+                       parsec-numbers
+  hs-source-dirs:      src
+  default-language:    Haskell2010
+
+test-suite tests
+  ghc-options:         -Wall
+  type:                exitcode-stdio-1.0
+  main-is:             Tests.hs
+  hs-source-dirs:      test
+  build-depends:       base,
+                       gomoku,
+                       hspec
+  default-language:    Haskell2010

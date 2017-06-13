@@ -1,5 +1,6 @@
 module Gomoku.BitBoard.PatternMatching (
-    openXsInBoard
+    openXsInBoard,
+    openXsInIntersection
 ) where
 
 import Gomoku.Abstractions
@@ -84,3 +85,42 @@ subsegmentsOf7 lineLength line = U.map createSubsegment (U.enumFromTo 0 (lineLen
     mask = 16383 :: Word32 -- (2^(7*2)) - 1     (mask for 7 fields: 11 11 11 11 11 11 11)
     createSubsegment d = mask .&. (shiftR line (d*2))
 
+
+
+openXsInIntersection :: U.Vector (Int, Word32) -> Int -> Player -> Int -> Int
+openXsInIntersection intersection size player x =
+  sumPrefixes + sumSuffixes + sumExacts + sumInfixes
+  where
+    prefixPatterns = patterns player Prefix x
+    suffixPatterns = patterns player Suffix x
+    infixPatterns = patterns player Infix x
+    exactPatterns = patterns player Exact x
+
+    -- All operations done by U.map / U.filter / U.sum, etc to utilize stream fusion
+
+    sumPrefixes = U.sum
+      $ U.map (\(_, line) -> U.sum $ U.map (\pattern -> if matchPrefix pattern line then 1 else 0) prefixPatterns)
+      $ U.filter (\(_, line) -> line /= 0)
+      $ U.filter (\(len, _) -> len >= 6)
+      $ intersection
+
+    sumSuffixes = U.sum
+      $ U.map (\(len, line) -> U.sum $ U.map (\pattern -> if matchSuffix pattern len line then 1 else 0) suffixPatterns)
+      $ U.filter (\(_, line) -> line /= 0)
+      $ U.filter (\(len, _) -> len >= 6)
+      $ intersection
+
+    sumExacts = U.sum
+      $ U.map (\(_, line) -> U.sum $ U.map (\pattern -> if matchExact pattern line then 1 else 0) exactPatterns)
+      $ U.filter (\(_, line) -> line /= 0)
+      $ U.filter (\(len, _) -> len == 5)
+      $ intersection
+
+    sumInfixes = U.sum
+      $ U.map (\(len, line) ->
+          U.sum $ U.map (\subsegment -> U.sum $ U.map (\pattern -> if matchExact pattern subsegment then 1 else 0) infixPatterns)
+            $ subsegmentsOf7 len line
+        )
+      $ U.filter (\(_, line) -> line /= 0)
+      $ U.filter (\(len, _) -> len >= 7)
+      $ intersection

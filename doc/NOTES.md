@@ -79,6 +79,7 @@ Struktury do reprezentacji stanu gry:
   - [TODO] Alfa-beta pruning
   - [TODO] Modyfikacja boardu zamiast kopiowania podczas przechodzenia drzewa gry
   - [TODO] modyfikacja mozliwych ruchów podczas przechodzenia drzewa gry zamiast generowania za kazdym razem
+  - [TODO] ewaluacja następnego ruchu = ewaluacja planszy aktualnej planszy - ewaluacja sktualnego skrzyzowania lini dla ruchu + ewaluacja skrzyzowania po wykonaniu ruchu
 
 
 # Zasady
@@ -111,6 +112,7 @@ Struktury do reprezentacji stanu gry:
                  cat <binary>.prof | ghc-prof-flamegraph > <binary>.folded
                  <binary>.folded | flamegraph.pl > <binary>.svg
     ```
+  - https://making.pusher.com/top-tips-and-tools-for-optimising-haskell/
 5. Alpha-Beta pruning:
   - http://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-4-alpha-beta-pruning/
   - http://web.cs.ucla.edu/~rosen/161/notes/alphabeta.html

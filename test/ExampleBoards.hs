@@ -1,6 +1,8 @@
-module Gomoku.Tests.ExampleBoards where
+module ExampleBoards where
 
-import Gomoku.BitBoardImpl
+import Gomoku.Abstractions
+import Gomoku.BitBoard
+import Gomoku.BitBoardImpl()
 
 
 exampleBoard :: BitBoard
@@ -74,18 +76,18 @@ exampleBoard5 = foldl (updateBoard) (blankBoard 5) moves
     where
         moves = [
                     (Move 0 0 Black),
-                    (Move 0 1 Black),
-                    (Move 0 2 Black),
+                    (Move 0 1 White),
                     (Move 0 3 Black),
+                    (Move 0 2 White),
 
                     (Move 1 0 Black),
+                    (Move 1 2 White),
                     (Move 1 1 Black),
-                    (Move 1 2 Black),
 
                     (Move 2 1 Black),
+                    (Move 4 0 White),
                     (Move 2 2 Black),
 
-                    (Move 4 0 Black),
 
                     (Move 3 0 White)
                 ]
