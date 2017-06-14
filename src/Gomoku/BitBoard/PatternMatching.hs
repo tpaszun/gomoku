@@ -18,21 +18,21 @@ import qualified Data.Vector.Unboxed as U
 
 -- prefix and suffix patterns are 6 fields long (6 * 2 bits = 12 bits)
 
-matchPrefix :: Word32 -> Word32 -> Bool
+matchPrefix :: Word64 -> Word64 -> Bool
 matchPrefix pattern line =
   ( (line .&. prefixMask) `xor` pattern ) == 0
 
-prefixMask :: Word32
+prefixMask :: Word64
 prefixMask = 4095 -- 2^(2*6) - 1
 
-matchSuffix :: Word32 -> Int -> Word32 -> Bool
+matchSuffix :: Word64 -> Int -> Word64 -> Bool
 matchSuffix pattern lineLength line =
   ( (line .&. shiftedMask) `xor` shiftedPattern ) == 0
   where
     shiftedPattern = shiftL pattern ((lineLength - 6) * 2)
     shiftedMask = shiftL 4095 ((lineLength - 6) * 2)
 
-matchExact :: Word32 -> Word32 -> Bool
+matchExact :: Word64 -> Word64 -> Bool
 matchExact pattern line =
   line `xor` pattern == 0
 
@@ -79,15 +79,15 @@ openXsInBoard board player x =
 
 
 -- get line subsegments of length 7
-subsegmentsOf7 :: Int -> Word32 -> U.Vector Word32
+subsegmentsOf7 :: Int -> Word64 -> U.Vector Word64
 subsegmentsOf7 lineLength line = U.map createSubsegment (U.enumFromTo 0 (lineLength - 7))
   where
-    mask = 16383 :: Word32 -- (2^(7*2)) - 1     (mask for 7 fields: 11 11 11 11 11 11 11)
+    mask = 16383 :: Word64 -- (2^(7*2)) - 1     (mask for 7 fields: 11 11 11 11 11 11 11)
     createSubsegment d = mask .&. (shiftR line (d*2))
 
 
 
-openXsInIntersection :: U.Vector (Int, Word32) -> Int -> Player -> Int -> Int
+openXsInIntersection :: U.Vector (Int, Word64) -> Int -> Player -> Int -> Int
 openXsInIntersection intersection size player x =
   sumPrefixes + sumSuffixes + sumExacts + sumInfixes
   where

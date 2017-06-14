@@ -19,6 +19,20 @@ exampleBoard = foldl (updateBoard) (blankBoard 19) moves
                     (Move 2 3 White)
                 ]
 
+exampleBoardFull :: BitBoard
+exampleBoardFull = foldl (updateBoard) (blankBoard 19) moves
+    where
+        moves = [
+                    (Move 9 9 Black),
+                    (Move 10 10 White),
+                    (Move 10 9 Black),
+                    (Move 11 9 White),
+                    (Move 9 10 Black),
+                    (Move 9 11 White),
+                    (Move 8 12 Black),
+                    (Move 8 11 White)
+                ]
+
 exampleBoardPre :: BitBoard
 exampleBoardPre = foldl (updateBoard) (blankBoard 8) moves
     where

@@ -47,7 +47,7 @@ library
 test-suite tests
   ghc-options:         -Wall
   type:                exitcode-stdio-1.0
-  main-is:             Tests.hs
+  main-is:             Spec.hs
   hs-source-dirs:      test
   build-depends:       base,
                        gomoku,

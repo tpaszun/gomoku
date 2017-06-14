@@ -7,7 +7,11 @@ module Gomoku.BitBoard (
     vertical,
     diagonalL,
     diagonalR,
-    getField
+    getField,
+    getFieldHorizontal,
+    getFieldVertical,
+    getFieldDiagonalL,
+    getFieldDiagonalR
 ) where
 
 import Gomoku.Abstractions
@@ -15,9 +19,8 @@ import Gomoku.Abstractions
 import qualified Data.Vector.Unboxed as U
 import Data.Word
 
-
 data BitBoard = BitBoard {
-  internalRep :: U.Vector Word32,
+  internalRep :: U.Vector Word64,
   boardLength :: Int
 }
 
@@ -42,9 +45,14 @@ getLineLength (BitBoard _ boardSize) lineNum
       diagonalLineNum = (lineNum - (boardSize * 2)) `mod` (boardSize * 2 - 1)
 
 class CBitBoard a where
-  horizontal :: a -> U.Vector Word32
-  vertical :: a -> U.Vector Word32
-  diagonalL :: a -> U.Vector Word32
-  diagonalR :: a -> U.Vector Word32
+  horizontal :: a -> U.Vector Word64
+  vertical :: a -> U.Vector Word64
+  diagonalL :: a -> U.Vector Word64
+  diagonalR :: a -> U.Vector Word64
 
   getField :: a -> (Int, Int) -> Field
+
+  getFieldHorizontal :: a -> (Int, Int) -> Field
+  getFieldVertical :: a -> (Int, Int) -> Field
+  getFieldDiagonalL :: a -> (Int, Int) -> Field
+  getFieldDiagonalR :: a -> (Int, Int) -> Field

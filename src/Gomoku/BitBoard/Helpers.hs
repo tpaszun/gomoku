@@ -26,10 +26,10 @@ showBoardAsBinary board =
     horiz = showBoard $ horizontal board
     vert = showBoard $ vertical board
 
-showLineAsBinary :: Int -> Word32 -> String
+showLineAsBinary :: Int -> Word64 -> String
 showLineAsBinary size line = L.concat $ L.intersperse " " $ L.map (showFieldAsBinary) [ shiftR line (i*2) .&. 3 | i <- [size-1,size-2..0] ]
 
-showFieldAsBinary :: Word32 -> String
+showFieldAsBinary :: Word64 -> String
 showFieldAsBinary 0 = "__"
 showFieldAsBinary 1 = "01"
 showFieldAsBinary 2 = "10"
@@ -42,7 +42,7 @@ showIntPad size x =
     leftPad = L.replicate (size - (length xStr)) ' '
 
 
-leftDiagonal :: BitBoard -> Move -> (Int, Word32)
+leftDiagonal :: BitBoard -> Move -> (Int, Word64)
 leftDiagonal board move =
     (len, diag)
   where
@@ -65,7 +65,7 @@ leftDiagonal board move =
                     (U.enumFromTo startX (startX+len))
 
 
-rightDiagonal :: BitBoard -> Move -> (Int, Word32)
+rightDiagonal :: BitBoard -> Move -> (Int, Word64)
 rightDiagonal board move =
     (len, diag)
   where

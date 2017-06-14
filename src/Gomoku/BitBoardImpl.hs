@@ -13,9 +13,9 @@ import Data.Bits
 
 
 {-
-  Store Board as a U.Vector Word32, where
-    each line is Word32
-    each field is 2 bits of Word32, where first field in list is least significant 2 bits
+  Store Board as a U.Vector Word64, where
+    each line is Word64
+    each field is 2 bits of Word64, where first field in list is least significant 2 bits
     and last field in list most significant 2 bits
     ie. X|O| | |X|O|O|X -> 01 10 10 01 00 00 10 01 -> 0110100100001001 -> 26889 (decimal) -> 0x6909
         |           | |    |  |                 |
@@ -27,8 +27,8 @@ import Data.Bits
     O - 10
     _ - 00
 
-    Word32 - 32bit => max 16 fields
-    For boards 16x16 < x <= 32x32 (19x19 particularly) Word32 should be changed to Word64
+    Word64 - 32bit => max 16 fields
+    For boards 16x16 < x <= 32x32 (19x19 particularly) Word64 should be changed to Word64
 
 
     Board stores:
@@ -48,14 +48,29 @@ instance Board BitBoard where
     bitboard {
       internalRep = (internalRep bitboard) U.// [
         (y, updatedHorizontalLine),
-        (boardLength bitboard + x, updatedVerticalLine)]
-        -- TODO: update diagonals
+        (boardSize + x, updatedVerticalLine),
+        (boardSize * 2 + diagonalLIndex, updatedDiagonalLLine),
+        (boardSize * 4 - 1 + diagonalRIndex, updatedDiagonalRLine)
+        ]
     }
     where
-      horizontalLine = (horizontal bitboard) U.! y
+      boardSize = boardLength bitboard
       updatedHorizontalLine = setLineElem horizontalLine x (Player player)
-      verticalLine = (vertical bitboard) U.! x
+        where horizontalLine = (horizontal bitboard) U.! y
       updatedVerticalLine = setLineElem verticalLine y (Player player)
+        where verticalLine = (vertical bitboard) U.! x
+      diagonalLIndex = x + y
+      updatedDiagonalLLine = setLineElem diagonalLLine diagonalLField (Player player)
+        where
+          diagonalLLine = (diagonalL bitboard) U.! (diagonalLIndex)
+          diagonalLField | diagonalLIndex < boardSize = y
+                         | otherwise = y - (diagonalLIndex - boardSize + 1)
+      diagonalRIndex = boardSize - 1 - (x - y)
+      updatedDiagonalRLine = setLineElem diagonalRLine diagonalRField (Player player)
+        where
+          diagonalRLine = (diagonalR bitboard) U.! (diagonalRIndex)
+          diagonalRField | diagonalRIndex < boardSize = y
+                         | otherwise = x
   genMoves bitboard player =
     map (\(x,y) -> Move x y player) availableFields
       where
@@ -133,7 +148,7 @@ instance Show BitBoard where
                           Player Black -> 'X'
                           Player White -> 'O'
                           Blank -> ' '
-      drawLine :: Word32 -> String
+      drawLine :: Word64 -> String
       drawLine line = L.intersperse '|' $ fmap (drawField) $ lineToFieldList (boardLength bitboard) line
       drawBoard = L.intersperse "\n" $ L.map (drawLine) $ U.toList board
         where
@@ -148,5 +163,10 @@ instance CBitBoard BitBoard where
   diagonalR (BitBoard internal boardLength) = U.slice (boardLength*4 - 1) (boardLength*2 - 1) internal
 
   getField (BitBoard board _) (x,y) = lineElem (board U.! y) x
+
+  getFieldHorizontal board (x,y) = lineElem ((horizontal board) U.! y) x
+  getFieldVertical board (x,y) = lineElem ((vertical board) U.! y) x
+  getFieldDiagonalL board (x,y) = lineElem ((diagonalL board) U.! y) x
+  getFieldDiagonalR board (x,y) = lineElem ((diagonalR board) U.! y) x
 
 

@@ -1,3 +1,5 @@
+{-# LANGUAGE ExistentialQuantification #-}
+
 module Gomoku.Abstractions where
 
 import Data.List
@@ -72,3 +74,15 @@ otherPlayer player = case player of
 
 notPlayerField :: Player -> [Field]
 notPlayerField player = [Blank, otherPlayer player] -- for Black: [Blank, Player White]
+
+
+data GameState' = forall b. Board b => GameState' {
+    board' :: b,
+    evaluation' :: BoardEvaluation,
+    moves' :: [Move]
+}
+
+instance Show GameState' where
+    show game =
+        --(show $ score $ evaluation game) ++ " " ++
+        (show $ head $ moves' game) ++ " " ++ (show $ evaluation' game)

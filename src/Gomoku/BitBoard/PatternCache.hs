@@ -12,7 +12,7 @@ import Gomoku.BitBoard.Wizardry
 
 
 -- get patterns from patterns cache
-patterns :: Player -> PatternType -> Int -> U.Vector Word32
+patterns :: Player -> PatternType -> Int -> U.Vector Word64
 patterns player patternType x =
   U.slice s l patternsCache
   where
@@ -48,7 +48,7 @@ patternsRange _ _ _ = error $ "invalid patternsRange request"
 
 
 -- store all generated patterns as a unboxed vector of patterns
-patternsCache :: U.Vector Word32
+patternsCache :: U.Vector Word64
 patternsCache =
   U.fromList $ L.map (fromLine) $
   L.concat [ genPatterns player patternType len | player <- [Black, White],
