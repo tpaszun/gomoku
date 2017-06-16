@@ -1,21 +1,20 @@
-module Main where
+module Main (
+    main
+) where
 
 import Gomoku.Abstractions
-import Gomoku.BitBoardImpl
 import Gomoku.AI
 import Gomoku.InputParser
 
 import Data.Time.Clock
-import Data.Char
 
-import Gomoku.BitBoard.Helpers
 
 main :: IO ()
 main = humanMove newGame Black
 
+humanMove :: GameState -> Player -> IO ()
 humanMove gameState player = do
-    let GameState board _ _ = gameState
-    putStrLn $ show board
+    putStrLn $ show $ board gameState
     putStrLn ("Player " ++ show player)
     line <- getLine
     let playerMove = parseMove player line
@@ -23,20 +22,21 @@ humanMove gameState player = do
     let newGameState = updateGameState gameState playerMove
     continueGame newGameState player aiMove
 
+aiMove :: GameState -> Player -> IO ()
 aiMove gameState player = do
-    let GameState board _ _ = gameState
-    putStrLn $ show board
+    putStrLn $ show $ board gameState
     putStrLn ("Player " ++ show player)
     t1 <- getCurrentTime
-    let aiMove = minimax (movesTreeOnlyBest 9) 4 gameState
-    putStrLn $ "Best AI move: " ++ show aiMove
+    let move = minimax (movesTreeOnlyBest 9) 4 gameState
+    putStrLn $ "Best AI move: " ++ show move
     t2 <- getCurrentTime
     let elapsed = diffUTCTime t2 t1
     putStrLn $ show elapsed
-    let newGameState = updateGameState gameState aiMove
+    let newGameState = updateGameState gameState move
     return ()
     continueGame newGameState player humanMove
 
+continueGame :: GameState -> Player -> (GameState -> Player -> IO ()) -> IO ()
 continueGame gameState player nextMoveFun = do
     if gameIsOver $ evaluation gameState
     then do

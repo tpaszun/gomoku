@@ -20,6 +20,7 @@ main = do
     let gameState = createGameState 19 threatBoard2
     simulation gameState
 
+simulation :: GameState -> IO ()
 simulation gameState = do
     putStrLn $ show $ board gameState
     putStrLn $ show $ evaluation gameState

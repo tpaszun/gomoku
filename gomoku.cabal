@@ -17,13 +17,13 @@ executable gomoku
   hs-source-dirs:      app
   main-is:             Main.hs
   default-language:    Haskell2010
-  ghc-options:         -O2
+  ghc-options:         -O2 -Wall
   build-depends:       base >= 4.7 && < 5,
                        gomoku,
                        time
 
 executable benchmark
-  ghc-options:         -O2
+  ghc-options:         -O2 -Wall
   main-is:             Main.hs
   hs-source-dirs:      benchmark
   build-depends:       base,
@@ -32,7 +32,7 @@ executable benchmark
   default-language:    Haskell2010
 
 executable ai-test
-  ghc-options:         -O2
+  ghc-options:         -O2 -Wall
   main-is:             Main.hs
   hs-source-dirs:      ai-test
   build-depends:       base,
@@ -42,7 +42,7 @@ executable ai-test
   default-language:    Haskell2010
 
 executable contest
-  ghc-options:         -O2
+  ghc-options:         -O2 -Wall
   main-is:             Main.hs
   hs-source-dirs:      contest
   build-depends:       base,
