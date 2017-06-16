@@ -33,7 +33,7 @@ aiMove gameState player = do
     putStrLn $ show board
     putStrLn ("Player " ++ show player)
     t1 <- getCurrentTime
-    let aiMove = minimax 4 gameState
+    let aiMove = minimax (movesTreeOnlyBest 9) 4 gameState
     putStrLn $ "Best AI move: " ++ show aiMove
     t2 <- getCurrentTime
     let elapsed = diffUTCTime t2 t1

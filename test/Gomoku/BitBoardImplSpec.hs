@@ -4,10 +4,19 @@ import Test.Hspec
 
 import Gomoku.Abstractions
 import Gomoku.BitBoard
-import Gomoku.BitBoardImpl()
+import Gomoku.BitBoardImpl
+import Gomoku.BitBoard.Helpers
+
+import ExampleBoards
 
 spec :: Spec
-spec =
+spec = do
+  updateBoardSpec
+  -- intersectionSpec
+  -- evaluateIntersectionSpec
+
+updateBoardSpec :: Spec
+updateBoardSpec =
   describe "updateBoard" $ do
     let b = blankBoard 4::BitBoard
 
@@ -93,3 +102,33 @@ updateBoardTest board move expected =
         getFieldDiagonalL b (diagL expected) `shouldBe` (Player Black)
       it ("should update right diagonals field " ++ (show $ diagR expected)) $ do
         getFieldDiagonalR b (diagR expected) `shouldBe` (Player Black)
+
+intersectionSpec :: Spec
+intersectionSpec =
+  describe "intersection" $ do
+    let b = exampleBoardFull
+    it "should create intersection" $ do
+      let inters = intersection b (9,10)
+      putStrLn $ showBoardAsBinary  b
+      putStrLn $ showIntersection inters
+
+evaluateIntersectionSpec :: Spec
+evaluateIntersectionSpec =
+  describe "evaluateIntersection" $ do
+    let b = exampleBoardFull
+    it "should evaluate intersection" $ do
+      putStrLn $ show $ evaluateIntersection b (9,11)
+    it "should calculate dif" $ do
+      let firstEval = evaluateIntersection b (10,11)
+      putStrLn $ show firstEval
+      let b' = updateBoard b (Move 10 11 Black)
+      let secondEval = evaluateIntersection b' (10,11)
+      putStrLn $ show secondEval
+      putStrLn $ show $ dif secondEval firstEval
+    it "should calculate dif" $ do
+      let firstEval = evaluateIntersection b (10,11)
+      putStrLn $ show firstEval
+      let b' = updateBoard b (Move 10 11 White)
+      let secondEval = evaluateIntersection b' (10,11)
+      putStrLn $ show secondEval
+      putStrLn $ show $ dif secondEval firstEval

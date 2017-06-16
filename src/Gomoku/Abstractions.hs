@@ -50,7 +50,7 @@ instance Show PlayerEvaluation where
             values = fmap (\f -> f eval) [fives, fours, threes, doubles]
             labels = ["fives", "fours", "threes", "doubles"]
             zipped = zip labels values
-            filtered = filter (\(_,value) -> value > 0) zipped
+            filtered = filter (\(_,value) -> value /= 0) zipped
             rendered = fmap (\(label, value) -> label ++ ": " ++ show value) filtered
 
 data BoardEvaluation = BoardEvaluation {
@@ -61,6 +61,40 @@ data BoardEvaluation = BoardEvaluation {
 instance Show BoardEvaluation where
     show eval =
         "Evaluation: X { " ++ (show $ black eval) ++ " } O { " ++ (show $ white eval) ++ " }"
+
+add :: BoardEvaluation -> BoardEvaluation -> BoardEvaluation
+add be1 be2 =
+  BoardEvaluation {
+      black = PlayerEvaluation {
+          fives = (fives $ black be1) + (fives $ black be2),
+          fours = (fours $ black be1) + (fours $ black be2),
+          threes = (threes $ black be1) + (threes $ black be2),
+          doubles = (doubles $ black be1) + (doubles $ black be2)
+      },
+      white = PlayerEvaluation {
+          fives = (fives $ white be1) + (fives $ white be2),
+          fours = (fours $ white be1) + (fours $ white be2),
+          threes = (threes $ white be1) + (threes $ white be2),
+          doubles = (doubles $ white be1) + (doubles $ white be2)
+      }
+  }
+
+dif :: BoardEvaluation -> BoardEvaluation -> BoardEvaluation
+dif be1 be2 =
+  BoardEvaluation {
+      black = PlayerEvaluation {
+          fives = (fives $ black be1) - (fives $ black be2),
+          fours = (fours $ black be1) - (fours $ black be2),
+          threes = (threes $ black be1) - (threes $ black be2),
+          doubles = (doubles $ black be1) - (doubles $ black be2)
+      },
+      white = PlayerEvaluation {
+          fives = (fives $ white be1) - (fives $ white be2),
+          fours = (fours $ white be1) - (fours $ white be2),
+          threes = (threes $ white be1) - (threes $ white be2),
+          doubles = (doubles $ white be1) - (doubles $ white be2)
+      }
+  }
 
 other :: Player -> Player
 other player = case player of

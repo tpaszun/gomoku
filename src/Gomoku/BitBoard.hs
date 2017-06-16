@@ -35,7 +35,9 @@ createBitBoard len = BitBoard {
     -- totalLength = len + len + (len * 2) - 1 + (len * 2) - 1
     totalLength = len * 6 - 2
 
-
+-- get line length from index on bitboard
+-- horizontal and vertical have length of board size
+-- diagonals have length from 1 to board size
 getLineLength :: BitBoard -> Int -> Int
 getLineLength (BitBoard _ boardSize) lineNum
   | lineNum < boardSize * 2 = boardSize
