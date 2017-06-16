@@ -1,8 +1,6 @@
 module Gomoku.AI where
 
 import Gomoku.Abstractions
---import Gomoku.ListImpl
---import Gomoku.UnboxedVectorImpl
 import Gomoku.BitBoard
 import Gomoku.BitBoardImpl
 import qualified Data.List as L
@@ -14,8 +12,6 @@ import Data.Tree.Pretty
 import Debug.Trace
 
 data GameState = GameState {
-    --board :: ListBoard,
-    --board :: UnboxedVectorBoard,
     board :: BitBoard,
     evaluation :: BoardEvaluation,
     moves :: [Move]
@@ -92,7 +88,7 @@ movesTree game =
     }
   where
     GameState board _ ((Move _ _ lastPlayer):_) = game
-    currentPlayer = other lastPlayer
+    currentPlayer = otherPlayer lastPlayer
     nextMoves = genNeighboringMoves board 1 currentPlayer
     nextGameState :: GameState -> Move -> Tree GameState
     nextGameState (GameState board _ moves) move =
@@ -110,7 +106,7 @@ movesTree game =
             board = updatedBoard,
             evaluation = (evaluateBoard updatedBoard),
             moves = move : moves }
-          nextMoves = genNeighboringMoves updatedBoard 1 (other player)
+          nextMoves = genNeighboringMoves updatedBoard 1 (otherPlayer player)
 
 type GameTreeGenerator = GameState -> Tree GameState
 
@@ -122,7 +118,7 @@ minimax gameTreeGen depth game =
       tree = gameTreeGen game
       nextMoves = fmap (head.moves.rootLabel) $ subForest tree
       (Move _ _ lastPlayer) = (head.moves.rootLabel) tree
-      currentPlayer = other lastPlayer
+      currentPlayer = otherPlayer lastPlayer
       minmaxfn = case currentPlayer of
                    Black -> min'
                    White -> max'
@@ -154,9 +150,7 @@ max' n tree =
 
 totalScore :: GameState -> Int
 totalScore (GameState _ eval _) =
-    --trace ("totalScore: " ++ show t) $
-    t
-    where t = (score $ white $ eval) - (score $ black $ eval)
+    (score $ white $ eval) - (score $ black $ eval)
 
 totalScoreEval :: BoardEvaluation -> Int
 totalScoreEval eval =
@@ -173,7 +167,7 @@ movesTreeInters game =
     }
   where
     GameState b bEval ((Move _ _ lastPlayer):_) = game
-    currentPlayer = other lastPlayer
+    currentPlayer = otherPlayer lastPlayer
     nextMoves = genNeighboringMoves b 1 currentPlayer
 
     nextGameState :: GameState -> Move -> Tree GameState
@@ -193,7 +187,7 @@ movesTreeInters game =
             board = updatedBoard,
             evaluation = add bEval $ dif newEval oldEval,
             moves = move : ms }
-          nextMoves = genNeighboringMoves updatedBoard 1 (other player)
+          nextMoves = genNeighboringMoves updatedBoard 1 (otherPlayer player)
 
 
 movesTreeOnlyBest :: Int -> GameState -> Tree GameState
@@ -204,7 +198,7 @@ movesTreeOnlyBest numBest game =
     }
   where
     GameState b bEval ((Move _ _ lastPlayer):_) = game
-    currentPlayer = other lastPlayer
+    currentPlayer = otherPlayer lastPlayer
 
     bestMoves =
         trace ("moves with score: " ++ (show sortedMovesWithScore)) $
@@ -229,7 +223,7 @@ movesTreeOnlyBest numBest game =
         }
         where
           Move x y player = move
-          currentPlayer = other player
+          currentPlayer = otherPlayer player
           updatedBoard = updateBoard b move
           oldEval = evaluateIntersection b (x,y)
           newEval = evaluateIntersection updatedBoard (x,y)

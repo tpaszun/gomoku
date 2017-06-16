@@ -31,14 +31,24 @@ parsePosC = do
 
 parseSinglePos = choice [parsePosI, parsePosC]
 
-parsePos = do
+parseSeparated = do
               x <- parseSinglePos
               spaces
               y <- parseSinglePos
               return (x,y)
 
+parseTuple = do
+  char '('
+  x <- parseSinglePos
+  char ','
+  y <- parseSinglePos
+  char ')'
+  return (x,y)
+
+parsePos = choice [parseSeparated, parseTuple]
+
 parseMove :: Player -> String -> Move
 parseMove player input =
   case parse parsePos "Parse error" input of
-    Right (x, y) -> Move x y player
+    Right (x, y) -> Move (x-1) (y-1) player
     Left x -> error (show x)

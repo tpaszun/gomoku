@@ -48,7 +48,5 @@ fromField Blank = 0
 fromField (Player Black) = 1
 fromField (Player White) = 2
 
-
-
 showAsBinary :: (Show a, Integral a) => a -> String
 showAsBinary x = showIntAtBase 2 intToDigit x ""

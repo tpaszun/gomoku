@@ -1,9 +1,9 @@
-# Board as Vector of Word32
+# Board as Vector of Word64
 
 ```
-  Store Board as a U.Vector Word32, where
-    each line is Word32
-    each field is 2 bits of Word32, where first field in list is least significant 2 bits
+  Store Board as a U.Vector Word64, where
+    each line is Word64
+    each field is 2 bits of Word64, where first field in list is least significant 2 bits
     and last field in list most significant 2 bits
     ie. X|O| | |X|O|O|X -> 01 10 10 01 00 00 10 01 -> 0110100100001001 -> 26889 (decimal) -> 0x6909
         |           | |    |  |                 |
@@ -14,9 +14,11 @@
     X - 01
     O - 10
     _ - 00
-```
+
     Word32 - 32bit => max 16 fields
-    For boards 16x16 < x <= 32x32 (19x19 particularly) Word32 should be changed to Word64
+    Word64 - 64bit => max 32 fields
+    For boards 16x16 < x <= 32x32 (19x19 particularly) Word64 should be used
+```
 
 ## Empty board (of size 8x8)
 
@@ -79,26 +81,12 @@ index  line                         line length
 ]
 ```
 
-## Line lengths
-
-  - horizontal & vertical: `line < (boardLength * 2) = boardLength`
-  - diagonal: `line >= (boardLength * 2) = (line - (boardLength * 2)) mod (boardLength * 2 - 1)`
-
-
 # Update board with move x, y
 
 - update horizontal line
-  line: y
-  field: x
 - update vertical line
-  line: x
-  field: y
 - update left diagonal line
-  line: x + y
-  field:
 - update right diagonal line
-  line:
-  field:
 
 
 # Evaluate player

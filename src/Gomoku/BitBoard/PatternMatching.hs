@@ -86,7 +86,6 @@ subsegmentsOf7 lineLength line = U.map createSubsegment (U.enumFromTo 0 (lineLen
     createSubsegment d = mask .&. (shiftR line (d*2))
 
 
-
 openXsInIntersection :: U.Vector (Int, Word64) -> Player -> Int -> Int
 openXsInIntersection intersection player x =
   sumPrefixes + sumSuffixes + sumExacts + sumInfixes

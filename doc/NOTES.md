@@ -23,28 +23,25 @@ Struktury do reprezentacji stanu gry:
   - Data.Map
 
 
-# [DONE] Wyświetlanie stanu gry, wczytywanie stanu gry
+# [DONE] Wyświetlanie stanu gry
 
 ```
- | | | | | | | | | | | | | | | | | |
- | | | | |X| | | | | | | | | | | | |
- | | | |X| | | | | | | | | | | | | |
- | |O|X| | | | | | | | | | | | | | |
- | |X|O|O| | | | | | | | | | | | | |
- | | |O| | | | | | | | | | | | | | |
- | | | | | | | | | | | | | | | | | |
- | | | | | | | | | | | | | | | | | |
- | | | | | | | | | | | | | | | | | |
- | | | | | | | | | | | | | | | | | |
- | | | | | | | | | | | | | | | | | |
- | | | | | | | | | | | | | | | | | |
- | | | | | | | | | | | | | | | | | |
- | | | | | | | | | | | | | | | | | |
- | | | | | | | | | | | | | | | | | |
- | | | | | | | | | | | | | | | | | |
- | | | | | | | | | | | | | | | | | |
- | | | | | | | | | | | | | | | | | |
- | | | | | | | | | | | | | | | | | |
+  ⒈ ⒉ ⒊ ⒋ ⒌ ⒍ ⒎ ⒏ ⒐ ⒑ ⒒ ⒓ ⒔ ⒕ ⒖
+⒈  | | | | | | | | | | | | | |
+⒉  | | | | | | | | | | | | | |
+⒊  | | | | | | | | | | | | | |
+⒋  | | | | | | | | | | | | | |
+⒌  | | | | | | | | | | | | | |
+⒍  | | | | | | | | | | | | | |
+⒎  | | | | | | | |X| | | | | |
+⒏  | | | | | | |X| | | | | | |
+⒐  | | | | | |O| |O| | | | | |
+⒑  | | | | | | | | | | | | | |
+⒒  | | | | | | | | | | | | | |
+⒓  | | | | | | | | | | | | | |
+⒔  | | | | | | | | | | | | | |
+⒕  | | | | | | | | | | | | | |
+⒖  | | | | | | | | | | | | | |
 ```
 
 # [DONE] Wykrywanie wygranej
@@ -79,7 +76,7 @@ Struktury do reprezentacji stanu gry:
   - [TODO] Alfa-beta pruning
   - [TODO] Modyfikacja boardu zamiast kopiowania podczas przechodzenia drzewa gry
   - [TODO] modyfikacja mozliwych ruchów podczas przechodzenia drzewa gry zamiast generowania za kazdym razem
-  - [TODO] ewaluacja następnego ruchu = ewaluacja planszy aktualnej planszy - ewaluacja sktualnego skrzyzowania lini dla ruchu + ewaluacja skrzyzowania po wykonaniu ruchu
+  - [DONE] ewaluacja następnego ruchu = ewaluacja planszy aktualnej planszy - ewaluacja sktualnego skrzyzowania lini dla ruchu + ewaluacja skrzyzowania po wykonaniu ruchu
 
 
 # Zasady
@@ -94,7 +91,7 @@ Struktury do reprezentacji stanu gry:
 4. Algorytm wyboru następnego ruchu:
   1. Czy jest taki ruch, ze wygrywam? Tak - wykonaj ten ruch
   2. Czy jest taki ruch, ze przeciwnik wygrywa?
-    Tak - Czy mogę zablokować ten ruch?
+    Tak - Czy mogę zablokować ten ruch? Tak - zablokuj ruch
 
 # Sources:
 1. Memoization https://wiki.haskell.org/Memoization
@@ -121,27 +118,3 @@ Struktury do reprezentacji stanu gry:
 
 
 # Data.Tree.Pretty drawVerticalTree
-
-
-# GUI
-
-## Web-based
-
-### Contracts
-
-- Start a new game
-  - Request
-    - player colour
-  - Response:
-    - game id
-- Make a move
-  - Request
-    - game id
-    - Move x y
-  - Response
-    - Game state
-
-### Web ui operations
-
-- Select player (Black, White)
-- Make a move (x, y)

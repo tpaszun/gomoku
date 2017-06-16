@@ -5,7 +5,6 @@ import Gomoku.AI
 
 import Criterion.Main
 
--- Our benchmark harness.
 main :: IO ()
 main = defaultMain [
     benchmarkThreatBoard "threat board 2 (best 3 moves evaluation)" 5 (movesTreeOnlyBest 3) threatBoard2,

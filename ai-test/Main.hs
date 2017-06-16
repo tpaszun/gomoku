@@ -148,7 +148,3 @@ exampleGame = [
     Move 12 10 Black,
     Move 13 11 White,
     Move 9 7 Black]
-
-    --Move 15 13 White,
-    --Move 8 6 Black
---]

@@ -1,22 +1,17 @@
 module Main where
 
 import Gomoku.Abstractions
---import Gomoku.ListImpl
---import Gomoku.UnboxedVectorImpl
 import Gomoku.BitBoardImpl
 import Gomoku.AI
 import Gomoku.InputParser
 
-import Data.Tree
 import Data.Time.Clock
 import Data.Char
 
-
 import Gomoku.BitBoard.Helpers
-import Debug.Trace
 
+main :: IO ()
 main = humanMove newGame Black
-
 
 humanMove gameState player = do
     let GameState board _ _ = gameState
@@ -53,28 +48,4 @@ continueGame gameState player nextMoveFun = do
         let whiteScore = score $ white $ evaluation gameState
         putStrLn $ "Black score: " ++ (show blackScore)
         putStrLn $ "White score: " ++ (show whiteScore)
-        --putStrLn $ drawTree $ treeToLevel 2 $ fmap (show) $ movesTree newGameState
-        let nextPlayer = case player of
-                        Black -> White
-                        White -> Black
-        nextMoveFun gameState nextPlayer
-
-
-
-
-
-----------
--- Helpers
-----------
-
-treeToLevel :: Int -> Tree a -> Tree a
-treeToLevel 0 tree =
-    Node {
-        rootLabel = rootLabel tree,
-        subForest = []
-    }
-treeToLevel level tree =
-    Node {
-        rootLabel = rootLabel tree,
-        subForest = fmap (treeToLevel (level - 1)) $ subForest tree
-    }
+        nextMoveFun gameState $ otherPlayer player

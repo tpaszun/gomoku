@@ -1,17 +1,16 @@
 module Gomoku.BitBoard (
     BitBoard(..),
-    createBitBoard,
     getLineLength,
     CBitBoard,
     horizontal,
     vertical,
     diagonalL,
     diagonalR,
-    getField,
-    getFieldHorizontal,
-    getFieldVertical,
-    getFieldDiagonalL,
-    getFieldDiagonalR
+    getField
+    -- getFieldHorizontal,
+    -- getFieldVertical,
+    -- getFieldDiagonalL,
+    -- getFieldDiagonalR
 ) where
 
 import Gomoku.Abstractions
@@ -24,16 +23,6 @@ data BitBoard = BitBoard {
   boardLength :: Int
 }
 
-createBitBoard :: Int -> BitBoard
-createBitBoard len = BitBoard {
-  internalRep = U.replicate totalLength 0,
-  boardLength = len
-}
-  where
-    -- diagonalLength = len * 2 - 1
-    -- horizontal + vertical + diagonalL + diagonalR
-    -- totalLength = len + len + (len * 2) - 1 + (len * 2) - 1
-    totalLength = len * 6 - 2
 
 -- get line length from index on bitboard
 -- horizontal and vertical have length of board size
@@ -47,14 +36,8 @@ getLineLength (BitBoard _ boardSize) lineNum
       diagonalLineNum = (lineNum - (boardSize * 2)) `mod` (boardSize * 2 - 1)
 
 class CBitBoard a where
-  horizontal :: a -> U.Vector Word64
-  vertical :: a -> U.Vector Word64
-  diagonalL :: a -> U.Vector Word64
-  diagonalR :: a -> U.Vector Word64
-
+  horizontal :: a -> U.Vector Word64 -- all lines horizontaly
+  vertical :: a -> U.Vector Word64   -- all lines verticaly
+  diagonalL :: a -> U.Vector Word64  -- all diagonals starting from left upper field
+  diagonalR :: a -> U.Vector Word64  -- all diagonals startung from right upper field
   getField :: a -> (Int, Int) -> Field
-
-  getFieldHorizontal :: a -> (Int, Int) -> Field
-  getFieldVertical :: a -> (Int, Int) -> Field
-  getFieldDiagonalL :: a -> (Int, Int) -> Field
-  getFieldDiagonalR :: a -> (Int, Int) -> Field

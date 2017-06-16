@@ -27,8 +27,9 @@ import Data.Bits
     O - 10
     _ - 00
 
-    Word64 - 32bit => max 16 fields
-    For boards 16x16 < x <= 32x32 (19x19 particularly) Word64 should be changed to Word64
+    Word32 - 32bit => max 16 fields
+    For boards 16x16 < x <= 32x32 (19x19 particularly) Word32 should be changed to Word64
+    Word64 - 64bit => max 32 fields
 
 
     Board stores:
@@ -36,14 +37,21 @@ import Data.Bits
       - vertical lines
       - left diagonals
       - right diagonals
-
-    "A left diagonal starts at the extreme left of the top row, while a right diagonal starts at the extreme right of the top row."
 -}
 
 
-
 instance Board BitBoard where
-  blankBoard = createBitBoard
+
+  blankBoard len = BitBoard {
+    internalRep = U.replicate totalLength 0,
+    boardLength = len
+  }
+    where
+    -- diagonalLength = len * 2 - 1
+    -- horizontal + vertical + diagonalL + diagonalR
+    -- totalLength = len + len + (len * 2) - 1 + (len * 2) - 1
+    totalLength = len * 6 - 2
+
   updateBoard bitboard (Move x y player) =
     bitboard {
       internalRep = (internalRep bitboard) U.// [
@@ -186,6 +194,15 @@ evaluateIntersectionForMove board move =
   where
     inters = intersectionForMove board move
 
+
+instance CBitBoard BitBoard where
+  horizontal (BitBoard internal boardLength) = U.slice 0 boardLength internal
+  vertical (BitBoard internal boardLength) = U.slice boardLength boardLength internal
+  diagonalL (BitBoard internal boardLength) = U.slice (boardLength*2) (boardLength*2 - 1) internal
+  diagonalR (BitBoard internal boardLength) = U.slice (boardLength*4 - 1) (boardLength*2 - 1) internal
+  getField (BitBoard board _) (x,y) = lineElem (board U.! y) x
+
+
 instance Show BitBoard where
   show bitboard = L.concat drawBoard
     where
@@ -196,23 +213,9 @@ instance Show BitBoard where
                           Blank -> ' '
       drawLine :: Word64 -> String
       drawLine line = L.intersperse '|' $ fmap (drawField) $ lineToFieldList (boardLength bitboard) line
-      drawBoard = L.intersperse "\n" $ L.map (drawLine) $ U.toList board
+      drawBoard = (L.intersperse "\n" $ top : L.zipWith (\num line -> num : ' ' : line ) nums (L.map (drawLine) $ U.toList board))
         where
           board = horizontal bitboard
 
-
-
-instance CBitBoard BitBoard where
-  horizontal (BitBoard internal boardLength) = U.slice 0 boardLength internal
-  vertical (BitBoard internal boardLength) = U.slice boardLength boardLength internal
-  diagonalL (BitBoard internal boardLength) = U.slice (boardLength*2) (boardLength*2 - 1) internal
-  diagonalR (BitBoard internal boardLength) = U.slice (boardLength*4 - 1) (boardLength*2 - 1) internal
-
-  getField (BitBoard board _) (x,y) = lineElem (board U.! y) x
-
-  getFieldHorizontal board (x,y) = lineElem ((horizontal board) U.! y) x
-  getFieldVertical board (x,y) = lineElem ((vertical board) U.! y) x
-  getFieldDiagonalL board (x,y) = lineElem ((diagonalL board) U.! y) x
-  getFieldDiagonalR board (x,y) = lineElem ((diagonalR board) U.! y) x
-
-
+      nums = ['\9352'..]
+      top = "  " ++ L.intersperse ' ' (take (boardLength bitboard) nums)
