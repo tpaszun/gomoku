@@ -15,8 +15,10 @@ import qualified Data.Vector.Unboxed as U
 import Data.Word
 
 data BitBoard = BitBoard {
-  internalRep :: U.Vector Word64,
-  boardLength :: Int
+  internalRep :: !(U.Vector Word64),
+  boardLength :: !Int,
+  topLeft :: !(Int, Int),
+  bottomRight :: !(Int, Int)
 }
 
 
@@ -24,7 +26,7 @@ data BitBoard = BitBoard {
 -- horizontal and vertical have length of board size
 -- diagonals have length from 1 to board size
 getLineLength :: BitBoard -> Int -> Int
-getLineLength (BitBoard _ boardSize) lineNum
+getLineLength (BitBoard _ boardSize _ _) lineNum
   | lineNum < boardSize * 2 = boardSize
   | diagonalLineNum < boardSize = diagonalLineNum + 1
   | otherwise = boardSize - (diagonalLineNum - boardSize + 1)

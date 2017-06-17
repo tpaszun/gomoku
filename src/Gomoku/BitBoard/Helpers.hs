@@ -18,7 +18,7 @@ showBoardAsBinary board =
   "\n\n left diagonal: \n\n" ++ diagL ++
   "\n\n right diagonal: \n\n" ++ diagR
   where
-    (BitBoard _ size) = board
+    (BitBoard _ size _ _) = board
     showBoard b = L.concat $ L.intersperse "\n"
       $ L.zipWith (\idx line -> (showIntPad 2 idx) ++ "    " ++ line) ([0..])
         $ L.map (showLineAsBinary size) $ U.toList b

@@ -70,6 +70,14 @@ score eval =
     threes eval   * 100 +
     doubles eval   * 10
 
+totalScore :: GameState -> Int
+totalScore (GameState _ eval _) =
+    (score $ white $ eval) - (score $ black $ eval)
+
+totalScoreEval :: BoardEvaluation -> Int
+totalScoreEval eval =
+    (score $ white $ eval) - (score $ black $ eval)
+
 gameIsOver :: BoardEvaluation -> Bool
 gameIsOver eval =
     (fives $ black eval) > 0 ||
@@ -148,18 +156,12 @@ max' n tree =
         then totalScore $ rootLabel tree
         else maximum $ fmap (min' (n - 1)) $ subForest tree
 
-totalScore :: GameState -> Int
-totalScore (GameState _ eval _) =
-    (score $ white $ eval) - (score $ black $ eval)
 
-totalScoreEval :: BoardEvaluation -> Int
-totalScoreEval eval =
-    (score $ white $ eval) - (score $ black $ eval)
 
 
 -- Optimized version
 
-movesTreeInters :: GameState -> Tree GameState
+movesTreeInters :: GameTreeGenerator
 movesTreeInters game =
     Node {
         rootLabel = game,
@@ -190,7 +192,7 @@ movesTreeInters game =
           nextMoves = genNeighboringMoves updatedBoard 1 (otherPlayer player)
 
 
-movesTreeOnlyBest :: Int -> GameState -> Tree GameState
+movesTreeOnlyBest :: Int -> GameTreeGenerator
 movesTreeOnlyBest numBest game =
     Node {
         rootLabel = game,

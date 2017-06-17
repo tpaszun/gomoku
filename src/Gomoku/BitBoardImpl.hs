@@ -44,7 +44,9 @@ instance Board BitBoard where
 
   blankBoard len = BitBoard {
     internalRep = U.replicate totalLength 0,
-    boardLength = len
+    boardLength = len,
+    topLeft = (maxBound :: Int, maxBound :: Int),
+    bottomRight = (minBound :: Int, minBound :: Int)
   }
     where
     -- diagonalLength = len * 2 - 1
@@ -58,7 +60,9 @@ instance Board BitBoard where
         (boardSize + x, updatedVerticalLine),
         (boardSize * 2 + diagonalLIndex, updatedDiagonalLLine),
         (boardSize * 4 - 1 + diagonalRIndex, updatedDiagonalRLine)
-        ]
+        ],
+      topLeft = (min (fst $ topLeft bitboard) x, min (snd $ topLeft bitboard) y),
+      bottomRight = (max (fst $ bottomRight bitboard) x, max (snd $ bottomRight bitboard) y)
     }
     where
       boardSize = boardLength bitboard
@@ -83,12 +87,16 @@ instance Board BitBoard where
     map (\(x,y) -> Move x y player) availableFields
     where
         len = boardLength bitboard
-        availableFields = [(x, y)| x <- [0..(len - 1)],
-                                   y <- [0..(len - 1)],
+        availableFields = [(x, y)| x <- [colStart..colStop],
+                                   y <- [rowStart..rowStop],
                                    getField bitboard (x, y) == Blank,
                                    let neighbours = [getField bitboard (neighbourX, neighbourY) | neighbourX <- [max (x-distance) 0..min (x+distance) (len-1)],
                                                                                                   neighbourY <- [max (y-distance) 0..min (y+distance) (len-1)]],
                                    any (/= Blank) neighbours]
+        colStart = max 0 ((fst $ topLeft bitboard) - 1)
+        colStop = min (len-1) ((fst $ bottomRight bitboard) + 1)
+        rowStart = max 0 ((snd $ topLeft bitboard) - 1)
+        rowStop = min (len-1) ((snd $ bottomRight bitboard) + 1)
 
   evaluatePlayer board player = PlayerEvaluation {
         fives = xss 5,
@@ -189,11 +197,11 @@ evaluateIntersectionForMove board move =
 
 
 instance CBitBoard BitBoard where
-  horizontal (BitBoard internal boardLength) = U.slice 0 boardLength internal
-  vertical (BitBoard internal boardLength) = U.slice boardLength boardLength internal
-  diagonalL (BitBoard internal boardLength) = U.slice (boardLength*2) (boardLength*2 - 1) internal
-  diagonalR (BitBoard internal boardLength) = U.slice (boardLength*4 - 1) (boardLength*2 - 1) internal
-  getField (BitBoard board _) (x,y) = lineElem (board U.! y) x
+  horizontal (BitBoard internal boardLength _ _) = U.slice 0 boardLength internal
+  vertical (BitBoard internal boardLength _ _) = U.slice boardLength boardLength internal
+  diagonalL (BitBoard internal boardLength _ _) = U.slice (boardLength*2) (boardLength*2 - 1) internal
+  diagonalR (BitBoard internal boardLength _ _) = U.slice (boardLength*4 - 1) (boardLength*2 - 1) internal
+  getField (BitBoard board _ _ _) (x,y) = lineElem (board U.! y) x
 
 
 instance Show BitBoard where

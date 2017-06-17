@@ -51,4 +51,4 @@ aiAgent :: GameState -> Move
 aiAgent gameState = minimax (movesTreeOnlyBest 9) 4 gameState
 
 printMove :: Move -> IO ()
-printMove (Move x y _) = putStrLn $ "(" ++ show x ++ "," ++ show y ++ ")"
+printMove (Move x y _) = putStrLn $ "(" ++ show (x+1) ++ "," ++ show (y+1) ++ ")"
