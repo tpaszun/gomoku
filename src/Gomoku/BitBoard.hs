@@ -7,10 +7,6 @@ module Gomoku.BitBoard (
     diagonalL,
     diagonalR,
     getField
-    -- getFieldHorizontal,
-    -- getFieldVertical,
-    -- getFieldDiagonalL,
-    -- getFieldDiagonalR
 ) where
 
 import Gomoku.Abstractions
@@ -39,5 +35,5 @@ class CBitBoard a where
   horizontal :: a -> U.Vector Word64 -- all lines horizontaly
   vertical :: a -> U.Vector Word64   -- all lines verticaly
   diagonalL :: a -> U.Vector Word64  -- all diagonals starting from left upper field
-  diagonalR :: a -> U.Vector Word64  -- all diagonals startung from right upper field
+  diagonalR :: a -> U.Vector Word64  -- all diagonals starting from right upper field
   getField :: a -> (Int, Int) -> Field

@@ -49,8 +49,7 @@ instance Board BitBoard where
     where
     -- diagonalLength = len * 2 - 1
     -- horizontal + vertical + diagonalL + diagonalR
-    -- totalLength = len + len + (len * 2) - 1 + (len * 2) - 1
-    totalLength = len * 6 - 2
+    totalLength = len + len + (len * 2) - 1 + (len * 2) - 1
 
   updateBoard bitboard (Move x y player) =
     bitboard {
@@ -79,13 +78,7 @@ instance Board BitBoard where
           diagonalRLine = (diagonalR bitboard) U.! (diagonalRIndex)
           diagonalRField | diagonalRIndex < boardSize = y
                          | otherwise = x
-  genMoves bitboard player =
-    map (\(x,y) -> Move x y player) availableFields
-      where
-        len = boardLength bitboard
-        availableFields = [(x, y)| x <- [0..(len - 1)],
-                                   y <- [0..(len - 1)],
-                                   getField bitboard (x, y) == Blank]
+
   genNeighboringMoves bitboard distance player =
     map (\(x,y) -> Move x y player) availableFields
     where

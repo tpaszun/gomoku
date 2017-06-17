@@ -14,7 +14,6 @@ data Move = Move Int Int Player deriving (Show, Eq, Ord)
 
 class Board a where
     blankBoard :: Int ->  a
-    genMoves :: a -> Player -> [Move]
     genNeighboringMoves :: a -> Int -> Player -> [Move]
     updateBoard :: a -> Move -> a
     evaluateBoard :: a -> BoardEvaluation
