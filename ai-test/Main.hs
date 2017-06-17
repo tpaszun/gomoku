@@ -2,22 +2,16 @@ module Main where
 
 import Gomoku.Abstractions
 import Gomoku.AI
+import Gomoku.GameState
 
 import Data.Tree
 import Data.Tree.Pretty
 
-xmain :: IO ()
-xmain = do
-    let gameState = createGameState 15 threatBoard2
-    putStrLn $ show $ board gameState
-    putStrLn $ drawVerticalTree $ printMovesTree $ treeToLevel 3 $ movesTreeOnlyBest 3 gameState
-    putStrLn $ show $ minimax (movesTreeOnlyBest 3) 3 gameState
-
 main :: IO ()
 main = do
     -- let gameState = createGameState 19 exampleGame
-    -- let gameState = createGameState 19 [Move 9 9 Black]
-    let gameState = createGameState 19 threatBoard2
+    let gameState = createGameState 19 [Move 9 9 Black]
+    -- let gameState = createGameState 19 threatBoard2
     simulation gameState
 
 simulation :: GameState -> IO ()
@@ -28,8 +22,8 @@ simulation gameState = do
     let (Move _ _ lastPlayer) = head $ moves gameState
     let depth = case lastPlayer of
                   Black -> 2
-                  White -> 7
-    let move = minimax (movesTreeOnlyBest 6) depth gameState
+                  White -> 4
+    let move = minimax (movesTreeOnlyBest 10) depth gameState
     putStrLn $ show move
     let updatedGameState = updateGameState gameState move
     if gameIsOver $ evaluation updatedGameState
@@ -40,32 +34,6 @@ simulation gameState = do
             putStrLn ("Winner: " ++ (show player))
             return ()
         else simulation updatedGameState
-
-
-oldmain :: IO ()
-oldmain = do
-    let gameState = createGameState 15 threatBoard2
-    depthTest gameState 1
-    depthTest gameState 2
-    depthTest gameState 3
-    depthTest gameState 4
-    depthTest gameState 5
-    depthTest gameState 6
-    return ()
-
-depthTest :: GameState -> Int -> IO ()
-depthTest gameState depth = do
-    putStrLn ("depth: " ++ show depth)
-    test gameState 3 depth
-    -- test gameState 5 depth
-    -- test gameState 10 depth
-
-test :: GameState -> Int -> Int -> IO ()
-test gameState numBest depth = do
-    putStrLn ("searching best " ++ show numBest ++ "moves")
-    let move = minimax (movesTreeOnlyBest numBest) depth gameState
-    putStrLn $ show move
-    return ()
 
 treeToLevel :: Int -> Tree a -> Tree a
 treeToLevel 0 tree =

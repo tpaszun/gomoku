@@ -2,6 +2,7 @@ module Main where
 
 import Gomoku.Abstractions
 import Gomoku.AI
+import Gomoku.GameState
 
 import Criterion.Main
 
@@ -12,11 +13,7 @@ main = defaultMain [
     benchmarkThreatBoard "threat board 2 (best 5 moves evaluation)" 5 (movesTreeOnlyBest 5) threatBoard2,
     benchmarkThreatBoard "threat board 1 (best 5 moves evaluation)" 5 (movesTreeOnlyBest 5) threatBoard1,
     benchmarkThreatBoard "threat board 2 (best 10 moves evaluation)" 5 (movesTreeOnlyBest 10) threatBoard2,
-    benchmarkThreatBoard "threat board 1 (best 10 moves evaluation)" 5 (movesTreeOnlyBest 10) threatBoard1,
-    benchmarkThreatBoard "threat board 2 (intersection evaluation)" 2 movesTreeInters threatBoard2,
-    benchmarkThreatBoard "threat board 1 (intersection evaluation)" 2 movesTreeInters threatBoard1,
-    benchmarkThreatBoard "threat board 2" 2 movesTree threatBoard2,
-    benchmarkThreatBoard "threat board 1" 1 movesTree threatBoard1
+    benchmarkThreatBoard "threat board 1 (best 10 moves evaluation)" 5 (movesTreeOnlyBest 10) threatBoard1
   ]
 
 benchmarkThreatBoard :: String -> Int -> GameTreeGenerator -> [Move] -> Benchmark

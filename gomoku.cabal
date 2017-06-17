@@ -53,13 +53,14 @@ library
   exposed-modules:     Gomoku.Abstractions,
                        Gomoku.AI,
                        Gomoku.BitBoard,
-                       Gomoku.BitBoardImpl,
                        Gomoku.BitBoard.Helpers,
-                       Gomoku.Patterns,
-                       Gomoku.BitBoard.PatternMatching,
                        Gomoku.BitBoard.PatternCache,
+                       Gomoku.BitBoard.PatternMatching,
                        Gomoku.BitBoard.Wizardry,
-                       Gomoku.InputParser
+                       Gomoku.BitBoardImpl,
+                       Gomoku.GameState,
+                       Gomoku.InputParser,
+                       Gomoku.Patterns
   build-depends:       base >= 4.7 && <5,
                        vector,
                        containers,

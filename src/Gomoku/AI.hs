@@ -3,6 +3,7 @@ module Gomoku.AI where
 import Gomoku.Abstractions
 import Gomoku.BitBoard
 import Gomoku.BitBoardImpl
+import Gomoku.GameState
 import qualified Data.List as L
 import Data.Tree
 import qualified Data.Vector.Unboxed as U
@@ -11,57 +12,6 @@ import Data.Tree.Pretty
 
 import Debug.Trace
 
-data GameState = GameState {
-    board :: BitBoard,
-    evaluation :: BoardEvaluation,
-    moves :: [Move]
-}
-
-instance Show GameState where
-    show game =
-        --(show $ score $ evaluation game) ++ " " ++
-        (show $ head $ moves game) ++ " " ++ (show $ evaluation game)
-
-
-newGame :: GameState
-newGame = GameState {
-    board = newBoard,
-    evaluation = BoardEvaluation {
-        black = emptyEvaluation,
-        white = emptyEvaluation
-    },
-    moves = []
-}
-  where
-    newBoard = blankBoard 15
-    emptyEvaluation = PlayerEvaluation {
-        fives = 0,
-        fours = 0,
-        threes = 0,
-        doubles = 0
-    }
-
-
-updateGameState :: GameState -> Move -> GameState
-updateGameState gameState move =
-    GameState {
-      board = updatedBoard,
-      evaluation = evaluateBoard updatedBoard,
-      moves = move : moveHistory
-    }
-  where
-    GameState bitboard _ moveHistory = gameState
-    updatedBoard = updateBoard bitboard move
-
-createGameState :: Int -> [Move] -> GameState
-createGameState size ms =
-    GameState {
-        board = b,
-        evaluation = evaluateBoard b,
-        moves = reverse ms
-    }
-    where
-        b = foldl (updateBoard) (blankBoard size) ms
 
 score :: PlayerEvaluation -> Int
 score eval =
@@ -80,47 +30,19 @@ totalScoreEval eval =
 
 gameIsOver :: BoardEvaluation -> Bool
 gameIsOver eval =
-    (fives $ black eval) > 0 ||
-    (fives $ white eval) > 0
+    ((fives $ black eval) > 0)
+    ||
+    ((fives $ white eval) > 0)
 
 ----------------------
 -- Generate moves tree
 ----------------------
 
-
-movesTree :: GameState -> Tree GameState
-movesTree game =
-    Node {
-        rootLabel = game,
-        subForest = fmap (nextGameState game) nextMoves
-    }
-  where
-    GameState board _ ((Move _ _ lastPlayer):_) = game
-    currentPlayer = otherPlayer lastPlayer
-    nextMoves = genNeighboringMoves board 1 currentPlayer
-    nextGameState :: GameState -> Move -> Tree GameState
-    nextGameState (GameState board _ moves) move =
-        Node {
-            rootLabel = gameState,
-            subForest = --if gameIsOver $ evaluation gameState
-                        --then []
-                        --else
-                        fmap (nextGameState gameState) nextMoves
-        }
-        where
-          Move _ _ player = move
-          updatedBoard = updateBoard board move
-          gameState = GameState {
-            board = updatedBoard,
-            evaluation = (evaluateBoard updatedBoard),
-            moves = move : moves }
-          nextMoves = genNeighboringMoves updatedBoard 1 (otherPlayer player)
-
 type GameTreeGenerator = GameState -> Tree GameState
 
 minimax :: GameTreeGenerator -> Int -> GameState -> Move
 minimax gameTreeGen depth game =
-      trace (show zipped) $
+    --   trace (show zipped) $
       snd $ best
   where
       tree = gameTreeGen game
@@ -157,105 +79,68 @@ max' n tree =
         else maximum $ fmap (min' (n - 1)) $ subForest tree
 
 
-
-
--- Optimized version
-
-movesTreeInters :: GameTreeGenerator
-movesTreeInters game =
-    Node {
-        rootLabel = game,
-        subForest = fmap (nextGameState game) nextMoves
-    }
-  where
-    GameState b bEval ((Move _ _ lastPlayer):_) = game
-    currentPlayer = otherPlayer lastPlayer
-    nextMoves = genNeighboringMoves b 1 currentPlayer
-
-    nextGameState :: GameState -> Move -> Tree GameState
-    nextGameState (GameState _ _ ms) move =
-        Node {
-            rootLabel = gameState,
-            subForest = if gameIsOver newEval
-                            then []
-                            else fmap (nextGameState gameState) nextMoves
-        }
-        where
-          Move x y player = move
-          updatedBoard = updateBoard b move
-          oldEval = evaluateIntersection b (x,y)
-          newEval = evaluateIntersection updatedBoard (x,y)
-          gameState = GameState {
-            board = updatedBoard,
-            evaluation = add bEval $ dif newEval oldEval,
-            moves = move : ms }
-          nextMoves = genNeighboringMoves updatedBoard 1 (otherPlayer player)
-
-
 movesTreeOnlyBest :: Int -> GameTreeGenerator
 movesTreeOnlyBest numBest game =
     Node {
         rootLabel = game,
-        subForest = L.map (nextGameState game)  bestMoves
+        subForest = if gameIsOver $ evaluation game
+            then []
+            else L.map (nextGameState) nextMoves
     }
-  where
-    GameState b bEval ((Move _ _ lastPlayer):_) = game
-    currentPlayer = otherPlayer lastPlayer
+    where
+        GameState b bEval ((Move _ _ lastPlayer):_) = game
+        currentPlayer = otherPlayer lastPlayer
 
-    bestMoves =
-        trace ("moves with score: " ++ (show sortedMovesWithScore)) $
-        L.take numBest $ L.map (snd) sortedMovesWithScore
-      where
-        allNextMoves = genNeighboringMoves b 2 currentPlayer
-        movesWithScore = L.map (\m -> (evalMove m, m)) allNextMoves
-        sortedMovesWithScore = L.reverse $ L.sort movesWithScore
-        evalMove move@(Move x y _) =
-            (score $ (playerScore currentPlayer) $ evaluateIntersectionForMove b move) +
-            (score $ (playerScore lastPlayer) $ evaluateIntersectionForMove b enemyMove)
-            where
-              enemyMove = Move x y lastPlayer
+        nextMoves =
+            if not $ null winningMove
+            then winningMove
+            else
+                if not $ null nonLosingMove
+                then nonLosingMove
+                else bestMoves
 
-    nextGameState :: GameState -> Move -> Tree GameState
-    nextGameState (GameState _ _ ms) move =
-        Node {
-            rootLabel = gameState,
-            subForest = if gameIsOver newEval
-                            then []
-                            else fmap (nextGameState gameState) bestMoves
-        }
-        where
-          Move x y player = move
-          currentPlayer = otherPlayer player
-          updatedBoard = updateBoard b move
-          oldEval = evaluateIntersection b (x,y)
-          newEval = evaluateIntersection updatedBoard (x,y)
-          gameState = GameState {
-            board = updatedBoard,
-            evaluation = add bEval $ dif newEval oldEval,
-            moves = move : ms }
-          bestMoves =
-              L.take numBest $ L.map (snd) sortedMovesWithScore
+        winningMove = take 1 (winningMoves game currentPlayer)
+        nonLosingMove = take 1 (nonLosingMoves game currentPlayer)
+
+        bestMoves = L.take numBest $ L.map (snd) sortedMovesWithScore
             where
-              allNextMoves = genNeighboringMoves updatedBoard 2 (currentPlayer)
-              movesWithScore = L.map (\m -> (evalMove m, m)) allNextMoves
-              sortedMovesWithScore = L.reverse $ L.sort movesWithScore
-              evalMove move@(Move x y _) =
-                (score $ (playerScore currentPlayer) $ evaluateIntersectionForMove updatedBoard move) +
-                (score $ (playerScore player) $ evaluateIntersectionForMove updatedBoard enemyMove)
-                where
-                  enemyMove = Move x y player
+                allNextMoves = genNeighboringMoves b 2 currentPlayer
+                movesWithScore = L.map (\m -> (evalMove m, m)) allNextMoves
+                sortedMovesWithScore = L.reverse $ L.sort movesWithScore
+                evalMove move@(Move x y _) =
+                    (score $ (playerScore currentPlayer) $ evaluateIntersectionForMove b move) +
+                    (score $ (playerScore lastPlayer) $ evaluateIntersectionForMove b enemyMove)
+                    where
+                        enemyMove = Move x y lastPlayer
+
+        nextGameState :: Move -> Tree GameState
+        nextGameState move =
+            movesTreeOnlyBest numBest gameState
+            where
+                Move x y player = move
+                currentPlayer = otherPlayer player
+                updatedBoard = updateBoard b move
+                oldEval = evaluateIntersection b (x,y)
+                newEval = evaluateIntersection updatedBoard (x,y)
+                gameState = GameState {
+                    board = updatedBoard,
+                    evaluation = add bEval $ dif newEval oldEval,
+                    moves = move : moves game }
 
 playerScore p = case p of
                   Black -> black
                   White -> white
 
-printMovesTree :: Tree GameState -> Tree String
-printMovesTree tree =
-    Node {
-        rootLabel = (show (x, y)) ++ " " ++ (show $ totalScore node),
-        subForest = L.map (printMovesTree) $ subForest tree
-    }
+winningMoves :: GameState -> Player -> [Move]
+winningMoves gameState player =
+    filter (\move -> (fives $ playerEval $ evaluateIntersectionForMove board move) > 0) neighbouringMoves
     where
-      node = rootLabel tree
-      (Move x y _) = head $ moves node
+        (GameState board _ _) = gameState
+        playerEval = case player of
+            Black -> black
+            White -> white
+        neighbouringMoves = genNeighboringMoves board 1 player
 
+nonLosingMoves :: GameState -> Player -> [Move]
+nonLosingMoves gameState player =
+    map (\(Move x y _) -> Move x y player) $ winningMoves gameState $ otherPlayer player

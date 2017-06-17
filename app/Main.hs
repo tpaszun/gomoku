@@ -4,6 +4,7 @@ module Main (
 
 import Gomoku.Abstractions
 import Gomoku.AI
+import Gomoku.GameState
 import Gomoku.InputParser
 
 import Data.Time.Clock

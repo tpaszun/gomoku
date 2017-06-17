@@ -4,6 +4,7 @@ import System.Environment
 
 import Gomoku.Abstractions
 import Gomoku.AI
+import Gomoku.GameState
 import Gomoku.InputParser
 
 main :: IO ()
