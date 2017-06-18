@@ -29,6 +29,7 @@ newGame = GameState {
     newBoard = blankBoard 15
     emptyEvaluation = PlayerEvaluation {
         fives = 0,
+        straightFours = 0,
         fours = 0,
         threes = 0,
         doubles = 0

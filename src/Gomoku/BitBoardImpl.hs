@@ -4,6 +4,7 @@ import Gomoku.Abstractions
 import Gomoku.BitBoard.Wizardry
 import Gomoku.BitBoard
 import Gomoku.BitBoard.PatternMatching
+import Gomoku.Patterns
 
 
 import qualified Data.Vector.Unboxed as U
@@ -99,13 +100,14 @@ instance Board BitBoard where
         rowStop = min (len-1) ((snd $ bottomRight bitboard) + 1)
 
   evaluatePlayer board player = PlayerEvaluation {
-        fives = xss 5,
-        fours = xss 4,
-        threes = xss 3,
-        doubles = xss 2
+        fives = xss Five,
+        straightFours = xss StraightFour,
+        fours = xss Four,
+        threes = xss Three,
+        doubles = xss Double
     }
       where
-        xss n = openXsInBoard board player n
+        xss = openXsInBoard board player
 
   evaluateBoard board = BoardEvaluation {
         black = evaluatePlayer board Black,
@@ -165,13 +167,14 @@ evaluateIntersection board pos =
   where
     inters = intersection board pos
     evaluatePlayer player = PlayerEvaluation {
-        fives = xss 5,
-        fours = xss 4,
-        threes = xss 3,
-        doubles = xss 2
+        fives = xss Five,
+        straightFours = xss StraightFour,
+        fours = xss Four,
+        threes = xss Three,
+        doubles = xss Double
     }
       where
-        xss n = openXsInIntersection inters player n
+        xss = openXsInIntersection inters player
 
 evaluateInters :: U.Vector (Int, Word64) -> BoardEvaluation
 evaluateInters inters =
@@ -181,13 +184,14 @@ evaluateInters inters =
   }
   where
     evaluatePlayer player = PlayerEvaluation {
-        fives = xss 5,
-        fours = xss 4,
-        threes = xss 3,
-        doubles = xss 2
+        fives = xss Five,
+        straightFours = xss StraightFour,
+        fours = xss Four,
+        threes = xss Three,
+        doubles = xss Double
     }
       where
-        xss n = openXsInIntersection inters player n
+        xss = openXsInIntersection inters player
 
 evaluateIntersectionForMove :: BitBoard -> Move -> BoardEvaluation
 evaluateIntersectionForMove board move =
@@ -218,5 +222,5 @@ instance Show BitBoard where
         where
           board = horizontal bitboard
 
-      nums = ['\9352'..]
+      nums = ['\9351'..]
       top = "  " ++ L.intersperse ' ' (take (boardLength bitboard) nums)

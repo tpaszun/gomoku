@@ -37,46 +37,12 @@ matchExact pattern line =
   line `xor` pattern == 0
 
 
-openXsInBoard :: BitBoard -> Player -> Int -> Int
-openXsInBoard board player x =
-  sumPrefixes + sumSuffixes + sumExacts + sumInfixes
+openXsInBoard :: BitBoard -> Player -> Pattern -> Int
+openXsInBoard board =
+  openXsInIntersection linesWithLength
   where
     bitBoard = internalRep board
-    prefixPatterns = patterns player Prefix x
-    suffixPatterns = patterns player Suffix x
-    infixPatterns = patterns player Infix x
-    exactPatterns = patterns player Exact x
-
-    getLineLen = getLineLength board
-
-    -- All operations done by U.map / U.filter / U.sum, etc to utilize stream fusion
-
-    sumPrefixes = U.sum
-      $ U.map (\line -> U.sum $ U.map (\pattern -> if matchPrefix pattern line then 1 else 0) prefixPatterns)
-      $ U.filter (\line -> line /= 0)
-      $ U.ifilter (\index _ -> (getLineLen index) >= 6) bitBoard
-
-    sumSuffixes = U.sum
-      $ U.map (\(len, line) -> U.sum $ U.map (\pattern -> if matchSuffix pattern len line then 1 else 0) suffixPatterns)
-      $ U.filter (\(_, line) -> line /= 0)
-      $ U.filter (\(len, _) -> len >= 6)
-      $ U.imap (\index line -> (getLineLen index, line)) bitBoard
-
-    sumExacts = U.sum
-      $ U.map (\(_, line) -> U.sum $ U.map (\pattern -> if matchExact pattern line then 1 else 0) exactPatterns)
-      $ U.filter (\(_, line) -> line /= 0)
-      $ U.filter (\(len, _) -> len == 5)
-      $ U.imap (\index line -> (getLineLen index, line)) bitBoard
-
-    sumInfixes = U.sum
-      $ U.map (\(len, line) ->
-          U.sum $ U.map (\subsegment -> U.sum $ U.map (\pattern -> if matchExact pattern subsegment then 1 else 0) infixPatterns)
-            $ subsegmentsOf7 len line
-        )
-      $ U.filter (\(_, line) -> line /= 0)
-      $ U.filter (\(len, _) -> len >= 7)
-      $ U.imap (\index line -> (getLineLen index, line)) bitBoard
-
+    linesWithLength = U.imap (\index line -> (getLineLength board index, line)) bitBoard
 
 -- get line subsegments of length 7
 subsegmentsOf7 :: Int -> Word64 -> U.Vector Word64
@@ -86,33 +52,33 @@ subsegmentsOf7 lineLength line = U.map createSubsegment (U.enumFromTo 0 (lineLen
     createSubsegment d = mask .&. (shiftR line (d*2))
 
 
-openXsInIntersection :: U.Vector (Int, Word64) -> Player -> Int -> Int
-openXsInIntersection intersection player x =
+openXsInIntersection :: U.Vector (Int, Word64) -> Player -> Pattern -> Int
+openXsInIntersection intersection player pattern =
   sumPrefixes + sumSuffixes + sumExacts + sumInfixes
   where
-    prefixPatterns = patterns player Prefix x
-    suffixPatterns = patterns player Suffix x
-    infixPatterns = patterns player Infix x
-    exactPatterns = patterns player Exact x
+    prefixPatterns = patterns player Prefix pattern
+    suffixPatterns = patterns player Suffix pattern
+    infixPatterns = patterns player Infix pattern
+    exactPatterns = patterns player Exact pattern
 
     -- All operations done by U.map / U.filter / U.sum, etc to utilize stream fusion
 
     sumPrefixes = U.sum
       $ U.map (\(_, line) -> U.sum $ U.map (\pattern -> if matchPrefix pattern line then 1 else 0) prefixPatterns)
       $ U.filter (\(_, line) -> line /= 0)
-      $ U.filter (\(len, _) -> len >= 6)
+      $ U.filter (\(len, _) -> len >= patternLength Prefix pattern)
       $ intersection
 
     sumSuffixes = U.sum
       $ U.map (\(len, line) -> U.sum $ U.map (\pattern -> if matchSuffix pattern len line then 1 else 0) suffixPatterns)
       $ U.filter (\(_, line) -> line /= 0)
-      $ U.filter (\(len, _) -> len >= 6)
+      $ U.filter (\(len, _) -> len >= patternLength Suffix pattern)
       $ intersection
 
     sumExacts = U.sum
       $ U.map (\(_, line) -> U.sum $ U.map (\pattern -> if matchExact pattern line then 1 else 0) exactPatterns)
       $ U.filter (\(_, line) -> line /= 0)
-      $ U.filter (\(len, _) -> len == 5)
+      $ U.filter (\(len, _) -> len == patternLength Exact pattern)
       $ intersection
 
     sumInfixes = U.sum
@@ -121,5 +87,5 @@ openXsInIntersection intersection player x =
             $ subsegmentsOf7 len line
         )
       $ U.filter (\(_, line) -> line /= 0)
-      $ U.filter (\(len, _) -> len >= 7)
+      $ U.filter (\(len, _) -> len >= patternLength Infix pattern)
       $ intersection

@@ -38,7 +38,8 @@ executable ai-test
   build-depends:       base,
                        containers,
                        pretty-tree,
-                       gomoku
+                       gomoku,
+                       time
   default-language:    Haskell2010
 
 executable contest
@@ -60,7 +61,8 @@ library
                        Gomoku.BitBoardImpl,
                        Gomoku.GameState,
                        Gomoku.InputParser,
-                       Gomoku.Patterns
+                       Gomoku.Patterns,
+                       Gomoku.Threats
   build-depends:       base >= 4.7 && <5,
                        vector,
                        containers,

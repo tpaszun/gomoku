@@ -7,11 +7,13 @@ import Gomoku.GameState
 import Data.Tree
 import Data.Tree.Pretty
 
+import Data.Time.Clock
+
 main :: IO ()
 main = do
-    -- let gameState = createGameState 19 exampleGame
-    let gameState = createGameState 19 [Move 9 9 Black]
-    -- let gameState = createGameState 19 threatBoard2
+    -- let gameState = createGameState 15 exampleGame
+    -- let gameState = createGameState 19 [Move 9 9 Black]
+    let gameState = createGameState 15 threatBoard2
     simulation gameState
 
 simulation :: GameState -> IO ()
@@ -21,10 +23,13 @@ simulation gameState = do
     putStrLn ("Total score: " ++ (show $ totalScore gameState))
     let (Move _ _ lastPlayer) = head $ moves gameState
     let depth = case lastPlayer of
-                  Black -> 2
-                  White -> 4
-    let move = minimax (movesTreeOnlyBest 10) depth gameState
+                  Black -> 1
+                  White -> 8
+    t1 <- getCurrentTime
+    let move = minimax (movesTreeOnlyBest 8) depth gameState
     putStrLn $ show move
+    t2 <- getCurrentTime
+    putStrLn $ "Elapsed time: " ++ (show $ diffUTCTime t2  t1)
     let updatedGameState = updateGameState gameState move
     if gameIsOver $ evaluation updatedGameState
         then do
@@ -101,6 +106,26 @@ threatBoard2 = [
 
     (Move 4 10 White),
     (Move 7 10 White)]
+
+threatBoard3 :: [Move]
+threatBoard3 = [
+    (Move 6 4 Black),
+
+    (Move 6 7 White),
+    (Move 7 7 Black),
+
+    (Move 5 8 White),
+    (Move 6 8 Black),
+    (Move 7 8 Black),
+
+    (Move 5 9 Black),
+    (Move 6 9 White),
+    (Move 7 9 Black),
+    (Move 11 9 White),
+
+    (Move 4 10 White),
+    (Move 7 10 White),
+    (Move 7 5 Black)]
 
 exampleGame :: [Move]
 exampleGame = [

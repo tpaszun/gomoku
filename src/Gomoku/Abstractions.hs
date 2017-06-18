@@ -26,6 +26,7 @@ data BoardEvaluation = BoardEvaluation {
 
 data PlayerEvaluation = PlayerEvaluation {
     fives :: Int,
+    straightFours :: Int,
     fours :: Int,
     threes :: Int,
     doubles :: Int
@@ -36,12 +37,14 @@ add be1 be2 =
   BoardEvaluation {
       black = PlayerEvaluation {
           fives = (fives $ black be1) + (fives $ black be2),
+          straightFours = (straightFours $ black be1) + (straightFours $ black be2),
           fours = (fours $ black be1) + (fours $ black be2),
           threes = (threes $ black be1) + (threes $ black be2),
           doubles = (doubles $ black be1) + (doubles $ black be2)
       },
       white = PlayerEvaluation {
           fives = (fives $ white be1) + (fives $ white be2),
+          straightFours = (straightFours $ white be1) + (straightFours $ white be2),
           fours = (fours $ white be1) + (fours $ white be2),
           threes = (threes $ white be1) + (threes $ white be2),
           doubles = (doubles $ white be1) + (doubles $ white be2)
@@ -53,12 +56,14 @@ dif be1 be2 =
   BoardEvaluation {
       black = PlayerEvaluation {
           fives = (fives $ black be1) - (fives $ black be2),
+          straightFours = (straightFours $ black be1) - (straightFours $ black be2),
           fours = (fours $ black be1) - (fours $ black be2),
           threes = (threes $ black be1) - (threes $ black be2),
           doubles = (doubles $ black be1) - (doubles $ black be2)
       },
       white = PlayerEvaluation {
           fives = (fives $ white be1) - (fives $ white be2),
+          straightFours = (straightFours $ white be1) - (straightFours $ white be2),
           fours = (fours $ white be1) - (fours $ white be2),
           threes = (threes $ white be1) - (threes $ white be2),
           doubles = (doubles $ white be1) - (doubles $ white be2)
