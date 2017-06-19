@@ -161,3 +161,18 @@ threatBoard2 = [
 
     (Move 4 10 White),
     (Move 7 10 White)]
+
+blackSureWin :: [Move]
+blackSureWin = [
+    (Move 9 9 Black),
+    (Move 8 8 White),
+    (Move 8 9 Black),
+    (Move 7 9 White),
+    (Move 9 10 Black),
+    (Move 9 7 White),
+    (Move 6 10 Black),
+    (Move 7 8 White),
+    (Move 9 11 Black),
+    (Move 9 8 White),
+    (Move 10 8 Black),
+    (Move 7 10 White)]

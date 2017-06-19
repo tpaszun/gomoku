@@ -1,0 +1,25 @@
+# Instrukcja kompilacji
+
+## Stack
+
+Aby skompilować i uruchomić program w trybie gry "Human vs AI" (gracz zaczyna grę) nalezy wykonać polecenia:
+
+```
+> stack build
+> stack exec gomoku
+```
+
+# Instrukcja kompilacji i uruchomienia programu konkursowego
+
+## Stack
+
+Aby skompilować i uruchomić program w trybie konkursowym nalezy wykonać polecenia:
+
+
+```
+> stack build
+> stack exec -- contest b <f1 >f2
+> stack exec -- contest w >f1 <f2
+```
+
+Pliki binarne znajdują się w katalogu: `.stack-work/install/x86_64-osx/lts-8.16/8.0.2/bin/contest`

@@ -2,7 +2,7 @@ module Gomoku.GameState where
 
 import Gomoku.Abstractions
 import Gomoku.BitBoard
-import Gomoku.BitBoardImpl
+import Gomoku.BitBoardImpl()
 
 data GameState = GameState {
     board :: BitBoard,

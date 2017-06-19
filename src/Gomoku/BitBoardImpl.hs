@@ -94,10 +94,10 @@ instance Board BitBoard where
                                    let neighbours = [getField bitboard (neighbourX, neighbourY) | neighbourX <- [max (x-distance) 0..min (x+distance) (len-1)],
                                                                                                   neighbourY <- [max (y-distance) 0..min (y+distance) (len-1)]],
                                    any (/= Blank) neighbours]
-        colStart = max 0 ((fst $ topLeft bitboard) - 1)
-        colStop = min (len-1) ((fst $ bottomRight bitboard) + 1)
-        rowStart = max 0 ((snd $ topLeft bitboard) - 1)
-        rowStop = min (len-1) ((snd $ bottomRight bitboard) + 1)
+        colStart = max 0 ((fst $ topLeft bitboard) - distance)
+        colStop = min (len-1) ((fst $ bottomRight bitboard) + distance)
+        rowStart = max 0 ((snd $ topLeft bitboard) - distance)
+        rowStop = min (len-1) ((snd $ bottomRight bitboard) + distance)
 
   evaluatePlayer board player = PlayerEvaluation {
         fives = xss Five,
@@ -119,119 +119,124 @@ instance Board BitBoard where
 intersection :: BitBoard -> (Int,Int) -> U.Vector (Int, Word64)
 intersection board (x,y) =
     U.fromList [
-      (boardSize, horiz),
-      (boardSize, vert),
-      (getLineLength board diagLLineNum, diagL),
-      (getLineLength board diagRLineNum, diagR)]
-  where
-    boardSize = boardLength board
-    horiz = (horizontal board) U.! y
-    vert = (vertical board) U.! x
-    diagLLineNum = boardSize * 2 + x + y
-    diagL = (diagonalL board) U.! (x+y)
-    diagRLineNum = boardSize * 5 - 2 - (x - y)
-    diagR = (diagonalR board) U.! (boardSize - 1 - (x - y))
+        (boardSize, horiz),
+        (boardSize, vert),
+        (getLineLength board diagLLineNum, diagL),
+        (getLineLength board diagRLineNum, diagR)]
+    where
+        boardSize = boardLength board
+        horiz = (horizontal board) U.! y
+        vert = (vertical board) U.! x
+        diagLLineNum = boardSize * 2 + x + y
+        diagL = (diagonalL board) U.! (x+y)
+        diagRLineNum = boardSize * 5 - 2 - (x - y)
+        diagR = (diagonalR board) U.! (boardSize - 1 - (x - y))
 
 intersectionForMove :: BitBoard -> Move -> U.Vector (Int, Word64)
 intersectionForMove board (Move x y player) =
     U.fromList [
-      (cutLine updatedHorizontalLine boardSize x),
-      (cutLine updatedVerticalLine boardSize y),
-      (cutLine updatedDiagL (getLineLength board diagLLineNum) diagonalLField),
-      (cutLine updatedDiagR (getLineLength board diagRLineNum) diagonalRField)]
-  where
-    boardSize = boardLength board
+        (cutLine updatedHorizontalLine boardSize x),
+        (cutLine updatedVerticalLine boardSize y),
+        (cutLine updatedDiagL (getLineLength board diagLLineNum) diagonalLField),
+        (cutLine updatedDiagR (getLineLength board diagRLineNum) diagonalRField)]
+    where
+        boardSize = boardLength board
 
-    horizontalLine = (horizontal board) U.! y
-    updatedHorizontalLine = setLineElem horizontalLine x (Player player)
+        horizontalLine = (horizontal board) U.! y
+        updatedHorizontalLine = setLineElem horizontalLine x (Player player)
 
-    verticalLine = (vertical board) U.! x
-    updatedVerticalLine = setLineElem verticalLine y (Player player)
+        verticalLine = (vertical board) U.! x
+        updatedVerticalLine = setLineElem verticalLine y (Player player)
 
-    diagLLineNum = boardSize * 2 + x + y
-    diagonalLIndex = x + y
-    diagonalLField | diagonalLIndex < boardSize = y
-                   | otherwise = y - (diagonalLIndex - boardSize + 1)
-    diagL = (diagonalL board) U.! (x+y)
-    updatedDiagL = setLineElem diagL diagonalLField (Player player)
+        diagLLineNum = boardSize * 2 + x + y
+        diagonalLIndex = x + y
+        diagonalLField | diagonalLIndex < boardSize = y
+                      | otherwise = y - (diagonalLIndex - boardSize + 1)
+        diagL = (diagonalL board) U.! (x+y)
+        updatedDiagL = setLineElem diagL diagonalLField (Player player)
 
-    diagRLineNum = boardSize * 5 - 2 - (x - y)
-    diagonalRIndex = boardSize - 1 - (x - y)
-    diagonalRField | diagonalRIndex < boardSize = y
-                   | otherwise = x
-    diagR = (diagonalR board) U.! (boardSize - 1 - (x - y))
-    updatedDiagR = setLineElem diagR diagonalRField (Player player)
+        diagRLineNum = boardSize * 5 - 2 - (x - y)
+        diagonalRIndex = boardSize - 1 - (x - y)
+        diagonalRField | diagonalRIndex < boardSize = y
+                      | otherwise = x
+        diagR = (diagonalR board) U.! (boardSize - 1 - (x - y))
+        updatedDiagR = setLineElem diagR diagonalRField (Player player)
 
 evaluateIntersection :: BitBoard -> (Int,Int) -> BoardEvaluation
 evaluateIntersection board pos =
-  BoardEvaluation {
-    black = evaluatePlayer Black,
-    white = evaluatePlayer White
-  }
-  where
-    inters = intersection board pos
-    evaluatePlayer player = PlayerEvaluation {
-        fives = xss Five,
-        straightFours = xss StraightFour,
-        fours = xss Four,
-        threes = xss Three,
-        openThrees = xss OpenThree,
-        brokenThrees = xss BrokenThree,
-        doubles = xss Double
+    BoardEvaluation {
+        black = evaluatePlayer Black,
+        white = evaluatePlayer White
     }
-      where
-        xss = openXsInIntersection inters player
+    where
+        inters = intersection board pos
+        evaluatePlayer player = PlayerEvaluation {
+            fives = xss Five,
+            straightFours = xss StraightFour,
+            fours = xss Four,
+            threes = xss Three,
+            openThrees = xss OpenThree,
+            brokenThrees = xss BrokenThree,
+            doubles = xss Double
+        }
+            where
+                xss = openXsInIntersection inters player
 
 evaluateInters :: U.Vector (Int, Word64) -> BoardEvaluation
 evaluateInters inters =
-  BoardEvaluation {
-    black = evaluatePlayer Black,
-    white = evaluatePlayer White
-  }
-  where
-    evaluatePlayer player = PlayerEvaluation {
-        fives = xss Five,
-        straightFours = xss StraightFour,
-        fours = xss Four,
-        threes = xss Three,
-        openThrees = xss OpenThree,
-        brokenThrees = xss BrokenThree,
-        doubles = xss Double
+    BoardEvaluation {
+        black = evaluatePlayer Black,
+        white = evaluatePlayer White
     }
-      where
-        xss = openXsInIntersection inters player
+    where
+        evaluatePlayer player = PlayerEvaluation {
+            fives = xss Five,
+            straightFours = xss StraightFour,
+            fours = xss Four,
+            threes = xss Three,
+            openThrees = xss OpenThree,
+            brokenThrees = xss BrokenThree,
+            doubles = xss Double
+        }
+            where
+                xss = openXsInIntersection inters player
 
 evaluateIntersectionForMove :: BitBoard -> Move -> BoardEvaluation
 evaluateIntersectionForMove board move =
-  evaluateInters inters
-  where
-    inters = intersectionForMove board move
+    evaluateInters inters
+    where
+        inters = intersectionForMove board move
 
 
 instance CBitBoard BitBoard where
-  horizontal (BitBoard internal boardLength _ _) = U.slice 0 boardLength internal
-  vertical (BitBoard internal boardLength _ _) = U.slice boardLength boardLength internal
-  diagonalL (BitBoard internal boardLength _ _) = U.slice (boardLength*2) (boardLength*2 - 1) internal
-  diagonalR (BitBoard internal boardLength _ _) = U.slice (boardLength*4 - 1) (boardLength*2 - 1) internal
-  getField (BitBoard board _ _ _) (x,y) = lineElem (board U.! y) x
+    horizontal (BitBoard internal boardLength _ _) = U.slice 0 boardLength internal
+    vertical (BitBoard internal boardLength _ _) = U.slice boardLength boardLength internal
+    diagonalL (BitBoard internal boardLength _ _) = U.slice (boardLength*2) (boardLength*2 - 1) internal
+    diagonalR (BitBoard internal boardLength _ _) = U.slice (boardLength*4 - 1) (boardLength*2 - 1) internal
+    getField (BitBoard board _ _ _) (x,y) = lineElem (board U.! y) x
 
 
 instance Show BitBoard where
-  show bitboard = L.concat drawBoard
-    where
-      drawField :: Field -> Char
-      drawField field = case field of
-                          Player Black -> 'X'
-                          Player White -> 'O'
-                          Blank -> ' '
-      drawLine :: Word64 -> String
-      drawLine line = L.intersperse '|' $ fmap (drawField) $ lineToFieldList (boardLength bitboard) line
-      drawBoard = (L.intersperse "\n" $ top : L.zipWith (\num line -> num : ' ' : line ) nums (L.map (drawLine) $ U.toList board))
+    show bitboard =
+        L.concat drawBoard
         where
-          board = horizontal bitboard
+            drawField :: Field -> Char
+            drawField field = case field of
+                  Player Black -> 'X'
+                  Player White -> 'O'
+                  Blank -> ' '
+            drawLine :: Word64 -> String
+            drawLine line =
+                L.intersperse '|' $
+                fmap (drawField) $ lineToFieldList (boardLength bitboard) line
+            drawBoard =
+                L.intersperse "\n" $
+                top : L.zipWith (\num line -> num : ' ' : line ) nums (L.map (drawLine) $ U.toList board)
+                where
+                    board = horizontal bitboard
 
-      nums = ['\9351'..]
-      top = "  " ++ L.intersperse ' ' (take (boardLength bitboard) nums)
+            nums = ['\9352'..]
+            top = "  " ++ L.intersperse ' ' (take (boardLength bitboard) nums)
 
 ----------------
 -- Debug helpers
@@ -241,4 +246,4 @@ intersectionHelper :: BitBoard -> Move -> [[Field]]
 intersectionHelper bitboard move =
     L.map (\(len, line) -> lineToFieldList len line) inters
     where
-      inters = U.toList $ intersectionForMove bitboard move
+        inters = U.toList $ intersectionForMove bitboard move

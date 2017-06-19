@@ -5,28 +5,32 @@ import Gomoku.AI
 import Gomoku.BitBoardImpl
 import Gomoku.GameState
 import Gomoku.Patterns
+import Gomoku.Utils
 
 import qualified Data.List as L
 import Data.Tree
 import Data.Maybe
 import qualified Data.Set as S
+import qualified GHC.Exts as E
 
 import Debug.Trace
 
 threats :: GameState -> Player -> [Move]
-threats game  player =
-    (filter (\move -> (fours $ playerEval $ evaluateIntersectionForMove bitboard move) == 1) neighbouringTwoFields)
-    ++
-    (filter (\move -> (openThrees $ playerEval $ evaluateIntersectionForMove bitboard move) == 1) neighbouringTwoFields)
-    ++
-    (filter (\move -> (brokenThrees $ playerEval $ evaluateIntersectionForMove bitboard move) == 1) neighbouringTwoFields)
+threats game player =
+    L.map (snd) $ L.reverse $ E.sortWith (fst) movesWithThreatsCount
     where
         GameState bitboard _ _ = game
         playerEval = case player of
             Black -> black
             White -> white
-        neighbouringOneField = genNeighboringMoves bitboard 1 player
         neighbouringTwoFields = genNeighboringMoves bitboard 2 player
+        movesWithThreatsCount :: [(Int, Move)]
+        movesWithThreatsCount =
+            L.filter (\(n,_) -> n > 0) $
+            L.map (\m -> (moveThreatsCount m, m)) neighbouringTwoFields
+        moveThreatsCount move = (fours moveEval) + (openThrees moveEval) + (brokenThrees moveEval)
+            where
+                moveEval = playerEval $ evaluateIntersectionForMove bitboard move
 
 threatsTree :: GameState -> Tree GameState
 threatsTree game =
@@ -49,10 +53,9 @@ threatsTree game =
                         Nothing ->
                             case listToMaybe (winningInNextTurnMoves game currentPlayer) of
                                 Just m -> [m]
-                                Nothing -> otherMoves
+                                Nothing -> nonLosingMovesAndThreats
 
-        otherMoves = rmdups $ (threats game currentPlayer) ++ (nonLosingInNextTurnMoves game currentPlayer)
-
+        nonLosingMovesAndThreats = (threats game currentPlayer) ++ (nonLosingInNextTurnMoves game currentPlayer)
 
         nextGameState :: Move -> Tree GameState
         nextGameState move =
@@ -109,9 +112,13 @@ winningBranch player game =
         pThreats = (fours pScore) + (openThrees pScore) + (brokenThrees pScore)
 
 
-printThreatsTree :: Tree GameState -> IO ()
-printThreatsTree tree =
-    putStrLn $ drawTree $ fmap (show) tree
+----------------
+-- Debug helpers
+----------------
+
+printThreatsTree :: Int -> Tree GameState -> IO ()
+printThreatsTree depth tree =
+    putStrLn $ drawTree $ treeToLevel depth $ fmap (show) tree
 
 
 printThreatSearchResults gameState =
@@ -119,9 +126,14 @@ printThreatSearchResults gameState =
     L.concat $ L.intersperse "\n" $
     fmap (\(n, s) -> (show n) ++ "\t" ++ (show s)) [(n, winningThreatSequence gameState n) | n <- [0..20]]
 
-----------
--- Helpers
-----------
-
-rmdups :: Ord a => [a] -> [a]
-rmdups = S.toList . S.fromList
+treeToLevel :: Int -> Tree a -> Tree a
+treeToLevel 0 tree =
+    Node {
+        rootLabel = rootLabel tree,
+        subForest = []
+    }
+treeToLevel level tree =
+    Node {
+        rootLabel = rootLabel tree,
+        subForest = fmap (treeToLevel (level - 1)) $ subForest tree
+    }

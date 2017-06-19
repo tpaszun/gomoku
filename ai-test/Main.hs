@@ -11,13 +11,12 @@ import Data.Maybe
 
 import Data.Time.Clock
 
-import Debug.Trace
-
 main :: IO ()
 main = do
     -- let gameState = createGameState 19 exampleGame
     let gameState = createGameState 19 [Move 9 9 Black]
     -- let gameState = createGameState 15 threatBoard2
+    -- let gameState = createGameState 19 blackSureWin
     simulation gameState
 
 simulation :: GameState -> IO ()
@@ -28,8 +27,8 @@ simulation gameState = do
     let (Move _ _ lastPlayer) = head $ moves gameState
     let currentPlayer = otherPlayer lastPlayer
     let currentAgent = case currentPlayer of
-                        Black -> whiteAgent -- blackAgent
-                        White -> blackAgent -- whiteAgent
+                        Black -> blackAgent
+                        White -> whiteAgent
     t1 <- getCurrentTime
     move <- currentAgent gameState
     putStrLn $ show move
@@ -48,12 +47,12 @@ simulation gameState = do
 
 blackAgent :: GameState -> IO Move
 blackAgent game = do
-    return $ minimax (movesTreeOnlyBest 8) 6 game
+    return $ minimax (movesTreeOnlyBest 6) 6 game
 
 whiteAgent :: GameState -> IO Move
 whiteAgent game = do
     t1 <- getCurrentTime
-    let sureWin = listToMaybe $ winningThreatSequence game 10
+    let sureWin = listToMaybe $ winningThreatSequence game 8
     putStrLn $ case sureWin of
             Nothing -> "sure win not found"
             Just move -> "sure win found: " ++ (show move)
@@ -62,20 +61,10 @@ whiteAgent game = do
     case sureWin of
         Just move -> return $ move
         Nothing ->
-            return $ minimax (movesTreeOnlyBest 10) 2 game
+            return $ minimax (movesTreeOnlyBest 6) 6 game
 
 
-treeToLevel :: Int -> Tree a -> Tree a
-treeToLevel 0 tree =
-    Node {
-        rootLabel = rootLabel tree,
-        subForest = []
-    }
-treeToLevel level tree =
-    Node {
-        rootLabel = rootLabel tree,
-        subForest = fmap (treeToLevel (level - 1)) $ subForest tree
-    }
+
 
 threatBoard1 :: [Move]
 threatBoard1 = [
@@ -167,3 +156,18 @@ exampleGame = [
     Move 12 10 Black,
     Move 13 11 White,
     Move 9 7 Black]
+
+blackSureWin :: [Move]
+blackSureWin = [
+    (Move 9 9 Black),
+    (Move 8 8 White),
+    (Move 8 9 Black),
+    (Move 7 9 White),
+    (Move 9 10 Black),
+    (Move 9 7 White),
+    (Move 6 10 Black),
+    (Move 7 8 White),
+    (Move 9 11 Black),
+    (Move 9 8 White),
+    (Move 10 8 Black),
+    (Move 7 10 White)]

@@ -4,11 +4,13 @@ import Gomoku.Abstractions
 import Gomoku.BitBoard
 import Gomoku.BitBoardImpl
 import Gomoku.GameState
+import Gomoku.Utils
 import qualified Data.List as L
 import Data.Tree
 import qualified Data.Vector.Unboxed as U
 
 import Data.Tree.Pretty
+import Data.Maybe
 
 import Debug.Trace
 
@@ -39,8 +41,8 @@ type GameTreeGenerator = GameState -> Tree GameState
 
 minimax :: GameTreeGenerator -> Int -> GameState -> Move
 minimax gameTreeGen depth game =
-    trace ("Candidates: " ++ (show $ bestMoves (board game) currentPlayer 10)) $
-    trace ("Best moves: " ++ (show zipped)) $
+    -- trace ("Candidates: " ++ (show $ bestMoves (board game) currentPlayer 10)) $
+    -- trace ("Best moves: " ++ (show zipped)) $
     snd $ bestMove
     where
         tree = gameTreeGen game
@@ -96,20 +98,15 @@ movesTreeOnlyBest numBest game =
         GameState currentBoard bEval ((Move _ _ lastPlayer):_) = game
         currentPlayer = otherPlayer lastPlayer
 
-        nextMoves =
-            if not $ null winningMove
-            then winningMove
-            else
-                if not $ null nonLosingMove
-                then nonLosingMove
-                else
-                    if not $ null winningInNextTurnMove
-                    then winningInNextTurnMove
-                    else best
+        nextMoves = case listToMaybe (winningMoves game currentPlayer) of
+            Just m -> [m]
+            Nothing -> case listToMaybe (nonLosingMoves game currentPlayer) of
+                Just m -> [m]
+                Nothing -> case listToMaybe (winningInNextTurnMoves game currentPlayer) of
+                    Just m -> [m]
+                    Nothing -> nonLosingMovesAndBest
 
-        winningMove = take 1 (winningMoves game currentPlayer)
-        nonLosingMove = take 1 (nonLosingMoves game currentPlayer)
-        winningInNextTurnMove = take 1 (winningInNextTurnMoves game currentPlayer)
+        nonLosingMovesAndBest = rmdups $ (best) ++ (nonLosingInNextTurnMoves game currentPlayer)
 
         best = L.map (snd) $ bestMoves currentBoard currentPlayer numBest
 

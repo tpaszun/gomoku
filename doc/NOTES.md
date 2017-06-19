@@ -95,7 +95,7 @@ Struktury do reprezentacji stanu gry:
 
 # Sources:
 1. Memoization https://wiki.haskell.org/Memoization
-2. Go-Moku and Threat-Space Search - algorytm nie uzyty w implementacji, ale pozwalający na due ulepszenie silnika AI
+2. Go-Moku and Threat-Space Search - algorytm nie uzyty w implementacji, ale pozwalający na ulepszenie silnika AI
   - http://www.renju.nu/wp-content/uploads/sites/46/2016/09/Go-Moku.pdf
   - https://www.mimuw.edu.pl/~awojna/SID/referaty/piechna/tss.html
   - http://rab.ict.pwr.wroc.pl/~abogdzie/gomoku/
@@ -115,6 +115,3 @@ Struktury do reprezentacji stanu gry:
   - http://web.cs.ucla.edu/~rosen/161/notes/alphabeta.html
   - http://inst.eecs.berkeley.edu/~cs61b/fa14/ta-materials/apps/ab_tree_practice/
   - https://hackage.haskell.org/package/game-tree-0.1.0.0
-
-
-# Data.Tree.Pretty drawVerticalTree
