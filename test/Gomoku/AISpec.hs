@@ -5,6 +5,7 @@ import Test.Hspec
 import Gomoku.Abstractions
 import Gomoku.BitBoard
 import Gomoku.AI
+import Gomoku.GameState
 
 import ExampleBoards
 
@@ -20,5 +21,5 @@ spec =
 minimaxTest :: GameState -> Int -> Spec
 minimaxTest game depth =
   it ("minimax with depth " ++ show depth) $ do
-    let m = minimax (movesTree) depth game
+    let m = minimax (movesTreeOnlyBest 5) depth game
     putStrLn $ show m

@@ -32,6 +32,8 @@ newGame = GameState {
         straightFours = 0,
         fours = 0,
         threes = 0,
+        openThrees = 0,
+        brokenThrees = 0,
         doubles = 0
     }
 

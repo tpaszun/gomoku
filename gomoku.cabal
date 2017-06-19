@@ -62,7 +62,7 @@ library
                        Gomoku.GameState,
                        Gomoku.InputParser,
                        Gomoku.Patterns,
-                       Gomoku.Threats
+                       Gomoku.ThreatSearch
   build-depends:       base >= 4.7 && <5,
                        vector,
                        containers,

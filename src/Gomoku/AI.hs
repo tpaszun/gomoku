@@ -25,10 +25,6 @@ totalScore :: GameState -> Int
 totalScore (GameState _ eval _) =
     (score $ white $ eval) - (score $ black $ eval)
 
-totalScoreEval :: BoardEvaluation -> Int
-totalScoreEval eval =
-    (score $ white $ eval) - (score $ black $ eval)
-
 gameIsOver :: BoardEvaluation -> Bool
 gameIsOver eval =
     ((fives $ black eval) > 0)
@@ -69,7 +65,7 @@ min' 0 tree =
 min' n tree =
     case nextMovesCount of
         0 -> totalScore $ rootLabel tree
-        1 -> minimum $ fmap (max' n) $ subForest tree
+        1 -> minimum $ fmap (max' (n)) $ subForest tree
         _ -> minimum $ fmap (max' (n - 1)) $ subForest tree
     where
         nextMovesCount = L.length $ subForest tree
@@ -82,7 +78,7 @@ max' 0 tree =
 max' n tree =
     case nextMovesCount of
         0 -> totalScore $ rootLabel tree
-        1 -> maximum $ fmap (min' n) $ subForest tree
+        1 -> maximum $ fmap (min' (n)) $ subForest tree
         _ -> maximum $ fmap (min' (n - 1)) $ subForest tree
     where
         nextMovesCount = L.length $ subForest tree
@@ -152,13 +148,20 @@ nonLosingMoves gameState player =
 
 winningInNextTurnMoves :: GameState -> Player -> [Move]
 winningInNextTurnMoves gameState player =
-    (filter (\move -> (straightFours $ playerEval $ evaluateIntersectionForMove board move) > 0) neighbouringMoves)
+    (filter (\move -> (straightFours $ playerEval $ evaluateIntersectionForMove board move) >= 1) neighbouringOneField)
+    ++
+    (filter (\move -> (fours $ playerEval $ evaluateIntersectionForMove board move) >= 2) neighbouringTwoFields)
     where
         (GameState board _ _) = gameState
         playerEval = case player of
             Black -> black
             White -> white
-        neighbouringMoves = genNeighboringMoves board 1 player
+        neighbouringOneField = genNeighboringMoves board 1 player
+        neighbouringTwoFields = genNeighboringMoves board 2 player
+
+nonLosingInNextTurnMoves :: GameState -> Player -> [Move]
+nonLosingInNextTurnMoves gameState player =
+    map (\(Move x y _) -> Move x y player) $ winningInNextTurnMoves gameState $ otherPlayer player
 
 bestMoves :: BitBoard -> Player -> Int -> [(Int, Move)]
 bestMoves board player numBest =

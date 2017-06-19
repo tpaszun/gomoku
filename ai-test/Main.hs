@@ -3,17 +3,21 @@ module Main where
 import Gomoku.Abstractions
 import Gomoku.AI
 import Gomoku.GameState
+import Gomoku.ThreatSearch
 
 import Data.Tree
 import Data.Tree.Pretty
+import Data.Maybe
 
 import Data.Time.Clock
 
+import Debug.Trace
+
 main :: IO ()
 main = do
-    -- let gameState = createGameState 15 exampleGame
-    -- let gameState = createGameState 19 [Move 9 9 Black]
-    let gameState = createGameState 15 threatBoard2
+    -- let gameState = createGameState 19 exampleGame
+    let gameState = createGameState 19 [Move 9 9 Black]
+    -- let gameState = createGameState 15 threatBoard2
     simulation gameState
 
 simulation :: GameState -> IO ()
@@ -22,14 +26,15 @@ simulation gameState = do
     putStrLn $ show $ evaluation gameState
     putStrLn ("Total score: " ++ (show $ totalScore gameState))
     let (Move _ _ lastPlayer) = head $ moves gameState
-    let depth = case lastPlayer of
-                  Black -> 1
-                  White -> 8
+    let currentPlayer = otherPlayer lastPlayer
+    let currentAgent = case currentPlayer of
+                        Black -> whiteAgent -- blackAgent
+                        White -> blackAgent -- whiteAgent
     t1 <- getCurrentTime
-    let move = minimax (movesTreeOnlyBest 8) depth gameState
+    move <- currentAgent gameState
     putStrLn $ show move
     t2 <- getCurrentTime
-    putStrLn $ "Elapsed time: " ++ (show $ diffUTCTime t2  t1)
+    putStrLn $ "Total move search elapsed time: " ++ (show $ diffUTCTime t2  t1)
     let updatedGameState = updateGameState gameState move
     if gameIsOver $ evaluation updatedGameState
         then do
@@ -39,6 +44,26 @@ simulation gameState = do
             putStrLn ("Winner: " ++ (show player))
             return ()
         else simulation updatedGameState
+
+
+blackAgent :: GameState -> IO Move
+blackAgent game = do
+    return $ minimax (movesTreeOnlyBest 8) 6 game
+
+whiteAgent :: GameState -> IO Move
+whiteAgent game = do
+    t1 <- getCurrentTime
+    let sureWin = listToMaybe $ winningThreatSequence game 10
+    putStrLn $ case sureWin of
+            Nothing -> "sure win not found"
+            Just move -> "sure win found: " ++ (show move)
+    t2 <- getCurrentTime
+    putStrLn $ ("sure win search time: " ++ (show $ diffUTCTime t2 t1))
+    case sureWin of
+        Just move -> return $ move
+        Nothing ->
+            return $ minimax (movesTreeOnlyBest 10) 2 game
+
 
 treeToLevel :: Int -> Tree a -> Tree a
 treeToLevel 0 tree =

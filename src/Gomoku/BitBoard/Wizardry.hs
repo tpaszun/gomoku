@@ -48,5 +48,26 @@ fromField Blank = 0
 fromField (Player Black) = 1
 fromField (Player White) = 2
 
+cutLine :: Word64 -> Int -> Int -> (Int, Word64)
+cutLine line lineLength fieldPosition =
+    (cutLength, cut)
+    where
+        start = max (fieldPosition - 5) 0
+        stop = min (fieldPosition + 5) (lineLength - 1)
+        cutLength = stop - start + 1
+        shifted = shiftR line (start * 2)
+        mask = 2^(2*cutLength) - 1
+        cut = shifted .&. mask
+
 showAsBinary :: (Show a, Integral a) => a -> String
 showAsBinary x = showIntAtBase 2 intToDigit x ""
+
+----------------
+-- Debug helpers
+----------------
+
+cutLineHelper :: [Field] -> Int -> [Field]
+cutLineHelper line pos =
+    lineToFieldList cutLength cut
+    where
+    (cutLength, cut) = cutLine (fromLine line) (length line) pos

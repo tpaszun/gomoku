@@ -29,6 +29,8 @@ data PlayerEvaluation = PlayerEvaluation {
     straightFours :: Int,
     fours :: Int,
     threes :: Int,
+    openThrees :: Int,
+    brokenThrees :: Int,
     doubles :: Int
 }
 
@@ -40,6 +42,8 @@ add be1 be2 =
           straightFours = (straightFours $ black be1) + (straightFours $ black be2),
           fours = (fours $ black be1) + (fours $ black be2),
           threes = (threes $ black be1) + (threes $ black be2),
+          openThrees = (openThrees $ black be1) + (openThrees $ black be2),
+          brokenThrees = (brokenThrees $ black be1) + (brokenThrees $ black be2),
           doubles = (doubles $ black be1) + (doubles $ black be2)
       },
       white = PlayerEvaluation {
@@ -47,6 +51,8 @@ add be1 be2 =
           straightFours = (straightFours $ white be1) + (straightFours $ white be2),
           fours = (fours $ white be1) + (fours $ white be2),
           threes = (threes $ white be1) + (threes $ white be2),
+          openThrees = (openThrees $ white be1) + (openThrees $ white be2),
+          brokenThrees = (brokenThrees $ white be1) + (brokenThrees $ white be2),
           doubles = (doubles $ white be1) + (doubles $ white be2)
       }
   }
@@ -59,6 +65,8 @@ dif be1 be2 =
           straightFours = (straightFours $ black be1) - (straightFours $ black be2),
           fours = (fours $ black be1) - (fours $ black be2),
           threes = (threes $ black be1) - (threes $ black be2),
+          openThrees = (openThrees $ black be1) - (openThrees $ black be2),
+          brokenThrees = (brokenThrees $ black be1) - (brokenThrees $ black be2),
           doubles = (doubles $ black be1) - (doubles $ black be2)
       },
       white = PlayerEvaluation {
@@ -66,6 +74,8 @@ dif be1 be2 =
           straightFours = (straightFours $ white be1) - (straightFours $ white be2),
           fours = (fours $ white be1) - (fours $ white be2),
           threes = (threes $ white be1) - (threes $ white be2),
+          openThrees = (openThrees $ white be1) - (openThrees $ white be2),
+          brokenThrees = (brokenThrees $ white be1) - (brokenThrees $ white be2),
           doubles = (doubles $ white be1) - (doubles $ white be2)
       }
   }
@@ -87,8 +97,8 @@ instance Show PlayerEvaluation where
     show eval =
         concat $ intersperse " " rendered
         where
-            values = fmap (\f -> f eval) [fives, fours, threes, doubles]
-            labels = ["fives", "fours", "threes", "doubles"]
+            values = fmap (\f -> f eval) [fives, straightFours, fours, threes, openThrees, brokenThrees, doubles]
+            labels = ["fives", "straight fours", "fours", "threes", "open threes", "broken threes", "doubles"]
             zipped = zip labels values
             filtered = filter (\(_,value) -> value /= 0) zipped
             rendered = fmap (\(label, value) -> label ++ ": " ++ show value) filtered
