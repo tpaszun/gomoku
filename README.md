@@ -56,9 +56,9 @@ Program zawiera funkcje wykrywające oczywiste ruchy gracza:
 ### Drzewo najlepszego ruchu przeglądane algorytmem minimax (`Gomoku.AI`)
 
 Program wykorzystuje algorytm minimax do przeglądania drzewa najlepszych ruchów. Do algorytmu minimax została dodana modyfikacja, która powoduje głębsze przeglądanie węzłów, które zawierają oczywisty ruch (jeżeli funkcja min/max natrafi na węzeł z jednym potomkiem to nie dekrementuje licznika głębokości). Funkcja generująca drzewo najlepszych ruchów wykorzystuje funkcje znajdujące oczywiste ruchy do redukcji ilości generowanych gałęzi (nie generuje oczywiście złych gałęzi). Gałęzienie drzewa najlepszych ruchów wykorzystuje:
-  - selekcję pól sąsiadujących z zajętymi polami w odległości co najwyżej dwóch pól
-  - szybką estymatę wartości pola (wartość pola dla przeciwnika + wartość pola dla gracza) - bazującą na wiedzy, że pole, które jest najlepsze dla przeciwnika to również pole, które jest najlepsze dla gracza.
-  - wybór `n` pól o najwyższej estymowanej wartości
+  - selekcję pól sąsiadujących z zajętymi polami w odległości co najwyżej dwóch pól,
+  - szybką estymatę wartości pola (wartość pola dla przeciwnika + wartość pola dla gracza) - bazującą na wiedzy, że pole, które jest najlepsze dla przeciwnika to również pole, które jest najlepsze dla gracza (gomoku jest grą o sumie zerowej),
+  - wybór `n` pól o najwyższej estymowanej wartości.
 
 ### Drzewo sekwencji wygrywających zagrożeń (`Gomoku.ThreatSearch`)
 
