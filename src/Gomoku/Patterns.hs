@@ -25,8 +25,6 @@ data PatternType = Five
                  | Double
                  deriving (Show, Enum, Bounded)
 
--- TODO: Add straight four patterns (_XXXX_) with weight equal of five
-
 patternLength :: PatternAlign -> PatternType -> Int
 patternLength Infix  StraightFour = 8
 patternLength Prefix StraightFour = 7

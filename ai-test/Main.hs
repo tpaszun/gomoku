@@ -5,7 +5,6 @@ import Gomoku.AI
 import Gomoku.GameState
 import Gomoku.ThreatSearch
 
-import Data.Tree
 import Data.Maybe
 
 import Data.Time.Clock
@@ -46,7 +45,7 @@ simulation gameState = do
 
 blackAgent :: GameState -> IO Move
 blackAgent game = do
-    return $ minimax (movesTreeOnlyBest 6) 6 game
+    return $ minimax (movesTreeOnlyBest 6) 5 game
 
 whiteAgent :: GameState -> IO Move
 whiteAgent game = do
@@ -60,7 +59,7 @@ whiteAgent game = do
     case sureWin of
         Just move -> return $ move
         Nothing ->
-            return $ minimax (movesTreeOnlyBest 6) 6 game
+            return $ minimax (movesTreeOnlyBest 6) 5 game
 
 
 
