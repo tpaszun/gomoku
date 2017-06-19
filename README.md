@@ -39,7 +39,7 @@ Motywacja konstrukcji planszy w postaci bitowej:
 
 Dla polepszenia czytelności możliwe jest silne typowanie bytów reprezentowanych przez typy proste (`newtype Line = Line Word64`, `newtype Pattern = Pattern Word64`). Najprawdopodobniej nie będzie miało to wpływu na wydajność, gdyż kompilator GHC podczas kompilacji zamienia typy `newtype` na typy proste użyte w definicji.
 
-## Wzorce i dopasowywanie (`Gomoku.Patterns`, `Gomoku.PatternCache`, `Gomoku.PAtternMatching`)
+## Wzorce i dopasowywanie (`Gomoku.Patterns`, `Gomoku.PatternCache`, `Gomoku.PatternMatching`)
 
 Wzorce w postaci binarnej generowane są podczas pierwszego ich użycia i cache'owane są w postaci wektora (`Data.Vector.Unboxed.Vector Word64`). Dopasowanie wzorca polega na odpowiednim przesunięciu bitowym lini oraz przycięciu (bitowy AND) lini i wykonaniu bitowego XORa - jeżeli wzorzec jest identyczny z dopasowywaną sekcją lini to wynik będzie równy 0.
 
