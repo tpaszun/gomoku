@@ -6,7 +6,6 @@ import Gomoku.GameState
 import Gomoku.ThreatSearch
 
 import Data.Tree
-import Data.Tree.Pretty
 import Data.Maybe
 
 import Data.Time.Clock
